@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useLogin } from "./useLogin";
+import { useTranslation } from 'react-i18next';
 
 export default function Page() {
   const {
@@ -13,6 +14,7 @@ export default function Page() {
     handleGoToTerms,
     handleSubmit,
   } = useLogin();
+  const { t } = useTranslation();
 
   return (
     <div className="flex h-full min-h-0 w-full flex-col">
@@ -31,10 +33,10 @@ export default function Page() {
 
             <div className="mt-8 text-center">
               <p className="text-base font-normal leading-6 text-[#4A4A4A]">
-                Embark on your Astrology Journey with
+                {t('embarkonYourAstrologyJourney') || 'Embark on your Astrology Journey with'}
               </p>
               <p className="mt-2 text-2xl font-semibold leading-tight text-[#222222]">
-                Nakshatra.ai Astrologer
+                {t('nakshatraAi') || 'Nakshatra.ai Astrologer'}
               </p>
             </div>
 
@@ -50,7 +52,7 @@ export default function Page() {
                   type="tel"
                   inputMode="numeric"
                   autoComplete="tel-national"
-                  placeholder="Enter Mobile Number"
+                  placeholder={t('enterMobileNumberHint') || "Enter Mobile Number"}
                   value={mobileNumber}
                   onChange={handleMobileChange}
                   className=" w-full px-4 pl-17 text-sm text-[#202020] outline-none placeholder:text-[#B0B0B0] h-[50px] rounded-[14px] border border-[#BEC3C7] bg-white"
@@ -59,13 +61,13 @@ export default function Page() {
             </label>
 
             <p className="mt-4 text-sm font-normal text-[#3A3A3A]">
-              Doesn't have a account?{" "}
+              {t('doesntHaveAccount') || "Doesn't have a account?"}{" "}
               <button
                 type="button"
                 onClick={handleGoToSignup}
                 className="font-semibold text-primary hover:opacity-90 cursor-pointer"
               >
-                Signup
+                {t('signup') || 'Signup'}
               </button>
             </p>
           </div>
@@ -73,13 +75,13 @@ export default function Page() {
 
         <footer className="shrink-0 px-5 pb-5">
           <p className="mb-3 text-center text-xs font-normal text-[#606060]">
-            By Submitting, you agree to our{" "}
+            {t('bySubmittingYouAgree') || 'By Submitting, you agree to our'}{" "}
             <button
               type="button"
               onClick={handleGoToTerms}
               className="font-medium underline underline-offset-2 text-primary cursor-pointer"
             >
-              Terms & Conditions
+              {t('termsAndConditions') || 'Terms & Conditions'}
             </button>
           </p>
 
@@ -88,7 +90,7 @@ export default function Page() {
             disabled={!isValidMobile || isSubmitting}
             className="w-full rounded-lg bg-primary py-3.5 text-center text-base font-semibold text-white transition-opacity hover:opacity-95 active:opacity-90 disabled:cursor-not-allowed disabled:bg-[#E89886] disabled:opacity-100"
           >
-            {isSubmitting ? "Submitting..." : "Submit"}
+            {isSubmitting ? (t('loading') || "Submitting...") : (t('submit') || "Submit")}
           </button>
         </footer>
       </form>

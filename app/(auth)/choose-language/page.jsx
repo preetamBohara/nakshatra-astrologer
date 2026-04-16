@@ -2,6 +2,9 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useTranslation } from 'react-i18next';
+// import i18n from '../../i18n/i18n';
+import i18n from "../../../i18n/i18n"
 
 const LANGUAGES = [
   { code: "en", label: "English" },
@@ -26,11 +29,13 @@ function CheckIcon(props) {
 
 export default function Page() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [selected, setSelected] = useState("en");
 
   function handleContinue() {
     try {
       localStorage.setItem("preferredLanguage", selected);
+      i18n.changeLanguage(selected);
     } catch {
       /* ignore quota / private mode */
     }
@@ -42,10 +47,10 @@ export default function Page() {
       <div className="flex h-full min-h-0 w-full flex-col overflow-hidden">
         <header className="shrink-0 p-5">
           <h1 className="text-xl font-semibold tracking-tight text-neutral-800 md:text-xl">
-            Choose your language
+            {t('chooseYourLanguage') || 'Choose your language'}
           </h1>
           <p className="mt-1.5 text-sm leading-relaxed text-neutral-500 font-normal">
-            Select your preferred language to use on your app
+            {t('selectPreferredLanguage') || 'Select your preferred language to use on your app'}
           </p>
         </header>
 

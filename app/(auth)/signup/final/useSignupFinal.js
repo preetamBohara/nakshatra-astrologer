@@ -110,7 +110,7 @@ export function useSignupFinal() {
       localStorage.removeItem("signupStepThreeData");
 
       toast.success(responseData?.message || "Registration completed successfully");
-      router.push("/choose-language");
+      router.push("/");
     } catch (error) {
       const message =
         error?.response?.data?.message || error?.message || "Unable to complete registration.";

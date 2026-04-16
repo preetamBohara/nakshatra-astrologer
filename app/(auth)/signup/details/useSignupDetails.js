@@ -23,6 +23,8 @@ export function useSignupDetails() {
   const [certificateFile, setCertificateFile] = useState(null);
   const [expertiseOptions, setExpertiseOptions] = useState([]);
   const [languageOptions, setLanguageOptions] = useState([]);
+  const [showAllExpertise, setShowAllExpertise] = useState(false);
+  const [showAllLanguages, setShowAllLanguages] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -125,6 +127,8 @@ export function useSignupDetails() {
     certificateFile,
     certificateInputRef,
     canSubmit,
+    showAllExpertise,
+    showAllLanguages,
     options: {
       EXPERIENCE_OPTIONS,
       EXPERTISE_LIST: expertiseOptions,
@@ -142,5 +146,9 @@ export function useSignupDetails() {
     handleRatePerMinVideoCall: handleRateChange(setRatePerMinVideoCall),
     handleOpenCertificatePicker,
     handleCertificateChange,
+    handleViewAllExpertise: () => setShowAllExpertise(true),
+    handleViewAllLanguages: () => setShowAllLanguages(true),
+    handleToggleExpertiseView: () => setShowAllExpertise((prev) => !prev),
+    handleToggleLanguagesView: () => setShowAllLanguages((prev) => !prev),
   };
 }
