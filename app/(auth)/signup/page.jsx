@@ -14,23 +14,6 @@ function ArrowLeftIcon() {
   );
 }
 
-function CameraIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="size-7" aria-hidden>
-      <path
-        d="M9.2 6.5 10 5c.2-.4.6-.6 1-.6h2c.4 0 .8.2 1 .6l.8 1.5h2.7c1 0 1.8.8 1.8 1.8v8.2c0 1-.8 1.8-1.8 1.8H6.5c-1 0-1.8-.8-1.8-1.8V8.3c0-1 .8-1.8 1.8-1.8h2.7Zm2.8 2.6a3.3 3.3 0 1 0 0 6.6 3.3 3.3 0 0 0 0-6.6Zm0 1.5a1.8 1.8 0 1 1 0 3.6 1.8 1.8 0 0 1 0-3.6Z"
-        fill="currentColor"
-      />
-    </svg>
-  );
-}
-
-const GENDER_OPTIONS = [
-  { value: "male", label: "Male" },
-  { value: "female", label: "Female" },
-  { value: "other", label: "Other" },
-];
-
 export default function Page() {
   const {
     form,
@@ -80,7 +63,12 @@ export default function Page() {
                     className="object-cover"
                   />
                 ) : (
-                  <CameraIcon />
+                  <svg viewBox="0 0 24 24" className="size-7" aria-hidden>
+                    <path
+                      d="M9.2 6.5 10 5c.2-.4.6-.6 1-.6h2c.4 0 .8.2 1 .6l.8 1.5h2.7c1 0 1.8.8 1.8 1.8v8.2c0 1-.8 1.8-1.8 1.8H6.5c-1 0-1.8-.8-1.8-1.8V8.3c0-1 .8-1.8 1.8-1.8h2.7Zm2.8 2.6a3.3 3.3 0 1 0 0 6.6 3.3 3.3 0 0 0 0-6.6Zm0 1.5a1.8 1.8 0 1 1 0 3.6 1.8 1.8 0 0 1 0-3.6Z"
+                      fill="currentColor"
+                    />
+                  </svg>
                 )}
               </button>
             </div>
@@ -111,38 +99,36 @@ export default function Page() {
 
               <label className="block">
                 <span className="mb-1 block text-sm font-normal text-[#2C2C2C]">Date of Birth</span>
-                <div className="relative">
-                  <input
-                    type="date"
-                    placeholder="Enter DOB"
-                    value={form.dob}
-                    onChange={handleFieldChange("dob")}
-                    className="h-[3.125rem] w-full rounded-lg border border-[#C8CDD0] bg-white px-3 text-sm text-[#2A2A2A] outline-none placeholder:text-[#A8A8A8]"
-                  />
-                </div>
+                <input
+                  type="date"
+                  value={form.dob}
+                  onChange={handleFieldChange("dob")}
+                  className="h-[3.125rem] w-full rounded-lg border border-[#C8CDD0] bg-white px-3 text-sm text-[#2A2A2A] outline-none placeholder:text-[#A8A8A8]"
+                />
               </label>
 
               <div>
                 <span className="mb-1 block text-sm font-normal text-[#2C2C2C]">Gender</span>
                 <div className="flex gap-2">
-                  {GENDER_OPTIONS.map((option) => {
-                    const isActive = gender === option.value;
-                    return (
-                      <button
-                        key={option.value}
-                        type="button"
-                        onClick={() => handleGenderChange(option.value)}
-                        className={[
-                          "h-[28px] rounded-md border px-4 text-xs font-normal transition-colors cursor-pointer",
-                          isActive
-                            ? "border-primary bg-primary text-white"
-                            : "border-[#C8CDD0] bg-white text-[#4A4A4A] hover:bg-[#F8F8F8]",
-                        ].join(" ")}
-                      >
-                        {option.label}
-                      </button>
-                    );
-                  })}
+                  {[
+                    { value: "male", label: "Male" },
+                    { value: "female", label: "Female" },
+                    { value: "other", label: "Other" },
+                  ].map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => handleGenderChange(option.value)}
+                      className={[
+                        "h-[28px] rounded-md border px-4 text-xs font-normal transition-colors cursor-pointer",
+                        gender === option.value
+                          ? "border-primary bg-primary text-white"
+                          : "border-[#C8CDD0] bg-white text-[#4A4A4A] hover:bg-[#F8F8F8]",
+                      ].join(" ")}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
                 </div>
               </div>
 
