@@ -174,7 +174,7 @@ export function useOtp() {
       localStorage.removeItem("astrologerAid");
       localStorage.removeItem("isNewAstrologer");
       toast.success(responseData?.message || "Login successfully");
-      router.push("/choose-language");
+      router.push("/");
     } catch (error) {
       const serverMessage =
         error?.response?.data?.message || error?.message || "OTP verification failed.";

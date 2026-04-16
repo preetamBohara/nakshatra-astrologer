@@ -44,6 +44,8 @@ export default function SignupDetailsPage() {
     certificateFile,
     certificateInputRef,
     canSubmit,
+    showAllExpertise,
+    showAllLanguages,
     options,
     handleBack,
     handleSubmit,
@@ -56,6 +58,10 @@ export default function SignupDetailsPage() {
     handleRatePerMinVideoCall,
     handleOpenCertificatePicker,
     handleCertificateChange,
+    handleViewAllExpertise,
+    handleViewAllLanguages,
+    handleToggleExpertiseView,
+    handleToggleLanguagesView,
   } = useSignupDetails();
 
   return (
@@ -100,12 +106,12 @@ export default function SignupDetailsPage() {
             <div>
               <div className="mb-2 flex items-center justify-between">
                 <p className="text-sm font-normal text-[#2C2C2C]">Expertise</p>
-                <button type="button" className="text-sm font-semibold text-primary cursor-pointer">
-                  View all
+                <button type="button" onClick={handleToggleExpertiseView} className="text-sm font-semibold text-primary cursor-pointer hover:underline">
+                  {showAllExpertise ? "View less" : "View all"}
                 </button>
               </div>
               <div className="flex flex-wrap gap-2.5">
-                {options.EXPERTISE_LIST.map((item) => (
+                {(showAllExpertise ? options.EXPERTISE_LIST : options.EXPERTISE_LIST.slice(0, 6)).map((item) => (
                   <Pill
                     key={item}
                     label={item}
@@ -120,12 +126,12 @@ export default function SignupDetailsPage() {
             <div>
               <div className="mb-2 flex items-center justify-between">
                 <p className="text-sm font-normal text-[#2C2C2C]">Language Known</p>
-                <button type="button" className="text-sm font-semibold text-primary cursor-pointer">
-                  View all
+                <button type="button" onClick={handleToggleLanguagesView} className="text-sm font-semibold text-primary cursor-pointer hover:underline">
+                  {showAllLanguages ? "View less" : "View all"}
                 </button>
               </div>
               <div className="flex flex-wrap gap-2.5">
-                {options.LANGUAGE_LIST.map((item) => (
+                {(showAllLanguages ? options.LANGUAGE_LIST : options.LANGUAGE_LIST.slice(0, 4)).map((item) => (
                   <Pill
                     key={item}
                     label={item}
