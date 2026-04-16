@@ -23,7 +23,7 @@ export default function DashboardLayout({ children }) {
         <button
           type="button"
           onClick={() => setSidebarState({ open: false, path: pathname })}
-          className="fixed inset-0 z-30 bg-black/35 lg:hidden"
+          className="fixed inset-0 z-30 cursor-pointer bg-black/35 lg:hidden"
           aria-label="Close sidebar"
         />
       ) : null}

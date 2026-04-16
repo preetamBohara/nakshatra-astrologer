@@ -2,21 +2,22 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslation } from "react-i18next";
 
 const MENU = [
-  { label: "Dashboard", icon: "home", href: "/" },
-  { label: "KYC Details", icon: "doc", badge: "check", href: "/kyc-details" },
-  { label: "Payout History", icon: "history", href: "/payout-history" },
-  { label: "Review & Ratings", icon: "user", href: "/review-ratings" },
-  { label: "Blogs", icon: "doc", href: "/blogs" },
-  { label: "Create Offer", icon: "help", href: "/create-offer" },
-  { label: "Sessions", icon: "chat", href: "/sessions" },
-  { label: "About Us", icon: "user", href: "/about-us" },
-  { label: "Privacy Policy", icon: "wallet", href: "/privacy-policy" },
-  { label: "Terms & Conditions", icon: "doc", href: "/terms-and-conditions" },
-  { label: "Support", icon: "help", href: "/help-support" },
-  { label: "Settings", icon: "history", href: "/settings" },
-  { label: "Logout", icon: "logout", href: "/logout" },
+  { labelKey: "dashboard", fallbackLabel: "Dashboard", icon: "home", href: "/" },
+  { labelKey: "kycDetails", fallbackLabel: "KYC Details", icon: "doc", badge: "check", href: "/kyc-details" },
+  { labelKey: "payoutHistory", fallbackLabel: "Payout History", icon: "history", href: "/payout-history" },
+  { labelKey: "reviewRatings", fallbackLabel: "Review & Ratings", icon: "user", href: "/review-ratings" },
+  { labelKey: "blogs", fallbackLabel: "Blogs", icon: "doc", href: "/blogs" },
+  { labelKey: "createOffer", fallbackLabel: "Create Offer", icon: "help", href: "/create-offer" },
+  { labelKey: "sessions", fallbackLabel: "Sessions", icon: "chat", href: "/sessions" },
+  { labelKey: "aboutUs", fallbackLabel: "About Us", icon: "user", href: "/about-us" },
+  { labelKey: "privacyPolicy", fallbackLabel: "Privacy Policy", icon: "wallet", href: "/privacy-policy" },
+  { labelKey: "termsConditions", fallbackLabel: "Terms & Conditions", icon: "doc", href: "/terms-and-conditions" },
+  { labelKey: "helpSupport", fallbackLabel: "Support", icon: "help", href: "/help-support" },
+  { labelKey: "settings", fallbackLabel: "Settings", icon: "history", href: "/settings" },
+  { labelKey: "logout", fallbackLabel: "Logout", icon: "logout", href: "/logout" },
 ];
 
 function isActivePath(pathname, href) {
@@ -82,6 +83,7 @@ function MenuIcon({ name }) {
 
 const Sidebar = ({ isOpen = false, onClose }) => {
   const pathname = usePathname();
+  const { t } = useTranslation();
 
   return (
     <>
@@ -104,18 +106,18 @@ const Sidebar = ({ isOpen = false, onClose }) => {
           <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-2 pb-4">
             {MENU.map((item) => (
               <Link
-                key={item.label}
+                key={item.href}
                 href={item.href}
                 onClick={onClose}
                 className={[
-                  "flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm transition-colors",
+                  "flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-3 text-left text-sm transition-colors",
                   isActivePath(pathname, item.href)
                     ? "bg-[#FFF0E5] font-medium text-[#1a1a1a]"
                     : "text-[#444] hover:bg-[#F8F6FA]",
                 ].join(" ")}
               >
                 <MenuIcon name={item.icon} />
-                <span className="flex-1">{item.label}</span>
+                <span className="flex-1">{t(item.labelKey) || item.fallbackLabel}</span>
                 {item.badge === "check" ? (
                   <span className="text-green-600" aria-hidden>
                     ✓

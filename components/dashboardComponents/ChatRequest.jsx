@@ -1,5 +1,8 @@
+"use client";
+
 import React from 'react'
 import EmptyState from '@/components/common/EmptyState'
+import { useTranslation } from "react-i18next";
 
 function ChatEmptyIcon() {
   return (
@@ -10,13 +13,15 @@ function ChatEmptyIcon() {
 }
 
 const ChatRequest = () => {
+  const { t } = useTranslation();
+
   return (
     <>
       <section className="flex flex-col rounded-2xl bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-base font-semibold text-[#1a1a1a]">Chat Requests</h2>
+        <h2 className="mb-4 text-base font-semibold text-[#1a1a1a]">{t("chatRequests") || "Chat Requests"}</h2>
         <EmptyState
-          title="No chat requests yet"
-          text="You will see incoming chat requests here when users connect with you."
+          title={t("noRequestAvailable") || "No chat requests yet"}
+          text={t("noRequestsYet") || "You will see incoming chat requests here when users connect with you."}
           icon={<ChatEmptyIcon />}
         />
       </section>

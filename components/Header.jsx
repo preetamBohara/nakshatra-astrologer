@@ -22,7 +22,7 @@ const Header = ({ onMenuClick }) => {
           <button
             type="button"
             onClick={onMenuClick}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#E8E4EC] text-[#444] lg:hidden"
+            className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-[#E8E4EC] text-[#444] lg:hidden"
             aria-label="Open sidebar"
           >
             <svg className="h-5 w-5" width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -36,7 +36,7 @@ const Header = ({ onMenuClick }) => {
         </div>
         <div className="flex items-center gap-3">
           <div className="rounded-full bg-primary px-3 py-1.5 text-sm font-semibold text-white">₹ 2</div>
-          <button type="button" className="rounded-full p-2 text-[#5C5C5C] hover:bg-[#F5F5F5]" aria-label="Notifications">
+          <button type="button" className="cursor-pointer rounded-full p-2 text-[#5C5C5C] hover:bg-[#F5F5F5]" aria-label="Notifications">
             <NavIcon name="bell" />
           </button>
         </div>
