@@ -14,11 +14,21 @@ function NavIcon({ name }) {
   }
 }
 
-const Header = () => {
+const Header = ({ onMenuClick }) => {
   return (
     <>
       <header className="flex shrink-0 items-center justify-between border-b border-[#E8E4EC] bg-white px-4 py-3 md:px-6">
         <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={onMenuClick}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#E8E4EC] text-[#444] lg:hidden"
+            aria-label="Open sidebar"
+          >
+            <svg className="h-5 w-5" width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+              <path d="M3 6h18M3 12h18M3 18h18" />
+            </svg>
+          </button>
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-sm font-bold text-white">
             N
           </span>

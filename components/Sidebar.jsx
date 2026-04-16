@@ -80,12 +80,17 @@ function MenuIcon({ name }) {
   );
 }
 
-const Sidebar = () => {
+const Sidebar = ({ isOpen = false, onClose }) => {
   const pathname = usePathname();
 
   return (
     <>
-        <aside className="flex w-55 shrink-0 flex-col border-r border-[#E8E4EC] bg-white md:w-62.5">
+        <aside
+          className={[
+            "fixed inset-y-0 left-0 z-40 flex w-55 shrink-0 flex-col border-r border-[#E8E4EC] bg-white transition-transform duration-200 ease-out md:w-62.5 lg:static lg:z-auto lg:translate-x-0",
+            isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
+          ].join(" ")}
+        >
           <div className="m-3 rounded-2xl bg-[#FFF0E5] p-4">
             <div className="flex gap-3">
               <div className="h-14 w-14 shrink-0 overflow-hidden rounded-full bg-[#E8D5CC]" />
@@ -101,6 +106,7 @@ const Sidebar = () => {
               <Link
                 key={item.label}
                 href={item.href}
+                onClick={onClose}
                 className={[
                   "flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm transition-colors",
                   isActivePath(pathname, item.href)
