@@ -1,7 +1,10 @@
 "use client";
 
+import { API_ENDPOINTS } from "@/constants/apiConstants";
+import { postAPI } from "@/lib/apiServices";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
+import toast from "react-hot-toast";
 
 const INITIAL_FORM = {
   fullName: "",
@@ -31,6 +34,12 @@ export function useSignup() {
   function handleFieldChange(field) {
     return function onFieldChange(event) {
       const value = event.target.value;
+      if (field === "fullName") {
+        // Allow only alphabets and spaces in full name.
+        const cleanName = value.replace(/[^A-Za-z\s]/g, "");
+        setForm((prev) => ({ ...prev, [field]: cleanName }));
+        return;
+      }
       if (field === "phoneNumber") {
         setForm((prev) => ({ ...prev, [field]: value.replace(/\D/g, "").slice(0, 10) }));
         return;
@@ -82,9 +91,39 @@ export function useSignup() {
 
     setIsSubmitting(true);
     try {
-      // Placeholder for signup API call.
-      await new Promise((resolve) => setTimeout(resolve, 300));
-      router.push("/choose-language");
+      const payload = { mobile: form.phoneNumber };
+      const response = await postAPI(API_ENDPOINTS.REGISTRATION_SEND_OTP, payload);
+      const responseData = response?.data;
+      if (!responseData?.status) {
+        throw new Error(responseData?.message || "Unable to send OTP. Please try again.");
+      }
+
+      const aidPayload = responseData?.data?.aid;
+      const aid = typeof aidPayload === "string" ? aidPayload : aidPayload?._id;
+      localStorage.setItem("signupMobile", form.phoneNumber);
+      if (aid) {
+        localStorage.setItem("signupAid", aid);
+      }
+      localStorage.setItem(
+        "signupStepOneData",
+        JSON.stringify({
+          name: form.fullName.trim(),
+          dob: form.dob,
+          email: form.email.trim(),
+          gender,
+          cityState: "",
+          image: null,
+          mobile: form.phoneNumber,
+          aid: aid || "",
+        })
+      );
+
+      toast.success(responseData?.message || "OTP sent successfully");
+      router.push("/signup/otp");
+    } catch (error) {
+      const message =
+        error?.response?.data?.message || error?.message || "Unable to send OTP. Please try again.";
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }

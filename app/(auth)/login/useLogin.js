@@ -1,7 +1,10 @@
 "use client";
 
+import { API_ENDPOINTS } from "@/constants/apiConstants";
+import { postAPI } from "@/lib/apiServices";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
+import toast from "react-hot-toast";
 
 export function useLogin() {
   const router = useRouter();
@@ -31,9 +34,34 @@ export function useLogin() {
 
     setIsSubmitting(true);
     try {
-      // Placeholder for login API integration.
-      await new Promise((resolve) => setTimeout(resolve, 250));
-      router.push("/choose-language");
+      const payload = { mobile: mobileNumber };
+      const response = await postAPI(API_ENDPOINTS.LOGIN_WITH_MOBILE, payload);
+      const responseData = response?.data;
+
+      if (!responseData?.status) {
+        throw new Error(responseData?.message || "Unable to send OTP. Please try again.");
+      }
+
+      const aidPayload = responseData?.data?.aid;
+      const aid =
+        (typeof aidPayload === "object" && aidPayload?.aid) ||
+        (typeof aidPayload === "object" && aidPayload?._id) ||
+        (typeof aidPayload === "string" ? aidPayload : "");
+      const isNewAstrologer = Boolean(responseData?.data?.newAstrologer);
+
+      localStorage.setItem("loginMobile", mobileNumber);
+      if (aid) {
+        localStorage.setItem("astrologerAid", aid);
+      }
+      localStorage.setItem("isNewAstrologer", String(isNewAstrologer));
+      toast.success(responseData?.message || "OTP sent successfully");
+      router.push("/otp");
+    } catch (error) {
+      const serverMessage =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Unable to send OTP. Please try again.";
+      toast.error(serverMessage);
     } finally {
       setIsSubmitting(false);
     }

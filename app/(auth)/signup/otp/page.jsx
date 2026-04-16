@@ -1,6 +1,6 @@
 "use client";
 
-import { useOtp } from "./useOtp";
+import { useSignupOtp } from "./useSignupOtp";
 
 function ArrowLeftIcon() {
   return (
@@ -13,23 +13,20 @@ function ArrowLeftIcon() {
   );
 }
 
-export default function Page() {
+export default function SignupOtpPage() {
   const {
     otp,
     canSubmit,
     isSubmitting,
-    isResending,
-    resendSeconds,
-    phoneNumber,
+    mobileNumber,
     inputRefs,
     handleBack,
-    handleEditPhone,
-    handleResendOtp,
+    handleEditMobile,
     handleSubmit,
     handleOtpChange,
     handleOtpKeyDown,
     handleOtpPaste,
-  } = useOtp();
+  } = useSignupOtp();
 
   return (
     <div className="flex h-full min-h-0 w-full flex-col">
@@ -42,10 +39,10 @@ export default function Page() {
 
             <h1 className="text-2xl font-semibold leading-tight text-[#26262B]">OTP Verification</h1>
             <p className="mt-2 text-sm font-normal text-[#313131]">
-              Verification Code sent to <span className="font-semibold">{phoneNumber}</span>{" "}
+              Verification Code sent to <span className="font-semibold">+91 {mobileNumber}</span>{" "}
               <button
                 type="button"
-                onClick={handleEditPhone}
+                onClick={handleEditMobile}
                 className="font-semibold text-primary hover:opacity-90"
               >
                 Edit
@@ -70,19 +67,6 @@ export default function Page() {
                 />
               ))}
             </div>
-
-            <p className="mt-8 text-sm font-normal text-[#3A3A3A]">
-              Didn&apos;t get OTP? Resend SMS in{" "}
-              {resendSeconds > 0 ? <span className="font-medium">{resendSeconds}s</span> : null}
-            </p>
-            <button
-              type="button"
-              onClick={handleResendOtp}
-              disabled={resendSeconds > 0 || isResending}
-              className="mt-1 text-sm cursor-pointer font-semibold text-primary underline underline-offset-2 disabled:cursor-not-allowed disabled:text-[#E89886] disabled:no-underline"
-            >
-              {isResending ? "Resending..." : "Resend OTP"}
-            </button>
           </div>
         </div>
 
