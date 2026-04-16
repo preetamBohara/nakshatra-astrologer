@@ -1,8 +1,7 @@
 import { Inter } from "next/font/google";
 import "./globals.css"
 import ToastProvider from "@/components/ToastProvider";
-// import { Providers } from "../components/I18nProvider";
-import '../i18n/i18n';
+import { I18nProvider } from "@/components/I18nProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -22,8 +21,10 @@ export default function RootLayout({ children }) {
       className={`${inter.variable} h-full antialiased`}
     >
       <body className="h-dvh overflow-hidden">
-        {children}
-        <ToastProvider />
+        <I18nProvider>
+          {children}
+          <ToastProvider />
+        </I18nProvider>
       </body>
     </html>
   );
