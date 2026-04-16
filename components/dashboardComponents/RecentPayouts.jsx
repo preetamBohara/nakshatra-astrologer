@@ -1,5 +1,8 @@
+"use client";
+
 import React from 'react'
 import EmptyState from '@/components/common/EmptyState'
+import { useTranslation } from "react-i18next";
 
 function PayoutEmptyIcon() {
   return (
@@ -10,13 +13,15 @@ function PayoutEmptyIcon() {
 }
 
 const RecentPayouts = () => {
+  const { t } = useTranslation();
+
   return (
     <section className="flex min-h-[220px] flex-col rounded-2xl bg-white p-5 shadow-sm">
-      <h2 className="text-base font-semibold text-[#1a1a1a]">Recent payouts</h2>
+      <h2 className="text-base font-semibold text-[#1a1a1a]">{t("recentPayouts") || "Recent payouts"}</h2>
       <EmptyState
         className="mt-4"
-        title="No payouts available"
-        text="Completed payout requests and transfers will appear in this section."
+        title={t("noPayoutsAvailableThisMonth") || "No payouts available"}
+        text={t("noPayoutsAvailable") || "Completed payout requests and transfers will appear in this section."}
         icon={<PayoutEmptyIcon />}
       />
     </section>

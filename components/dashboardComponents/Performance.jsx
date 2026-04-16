@@ -1,11 +1,14 @@
+"use client";
+
 import React from 'react'
+import { useTranslation } from "react-i18next";
 
 const METRICS = [
-  { label: "Total Voice Calls", value: "1", change: "+80.00%", icon: "phone" },
-  { label: "Total Video Calls", value: "0", change: "+0.00%", icon: "video" },
-  { label: "Total Chats", value: "0", change: "+0.00%", icon: "bubble" },
-  { label: "Total Earnings", value: "₹0", change: "+0.00%", icon: "rupee" },
-  { label: "Total Duration", value: "0s", change: "+0.00%", icon: "clock" },
+  { labelKey: "totalVoiceCalls", fallbackLabel: "Total Voice Calls", value: "1", change: "+80.00%", icon: "phone" },
+  { labelKey: "totalVideoCalls", fallbackLabel: "Total Video Calls", value: "0", change: "+0.00%", icon: "video" },
+  { labelKey: "totalChats", fallbackLabel: "Total Chats", value: "0", change: "+0.00%", icon: "bubble" },
+  { labelKey: "totalEarnings", fallbackLabel: "Total Earnings", value: "₹0", change: "+0.00%", icon: "rupee" },
+  { labelKey: "totalDuration", fallbackLabel: "Total Duration", value: "0s", change: "+0.00%", icon: "clock" },
 ];
 
 
@@ -57,13 +60,15 @@ function MetricIcon({ name }) {
 }
 
 const Performance = () => {
+  const { t } = useTranslation();
+
   return (
     <>
         <section>
           <div className="flex flex-wrap gap-3 md:flex-nowrap md:justify-between">
             {METRICS.map((m) => (
               <div
-                key={m.label}
+                key={m.labelKey}
                 className="flex min-w-35 flex-1 flex-col gap-2 rounded-2xl border border-[#EEE8F0] bg-white p-4 shadow-sm"
               >
                 <div className="flex items-start justify-between gap-2">
@@ -71,7 +76,7 @@ const Performance = () => {
                   <span className="text-xs font-medium text-green-600">{m.change}</span>
                 </div>
                 <p className="text-xl font-semibold text-[#1a1a1a]">{m.value}</p>
-                <p className="text-xs leading-snug text-[#666]">{m.label}</p>
+                <p className="text-xs leading-snug text-[#666]">{t(m.labelKey) || m.fallbackLabel}</p>
               </div>
             ))}
           </div>
