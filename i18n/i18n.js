@@ -11,6 +11,8 @@ import ta from './languages/ta.json';
 import te from './languages/te.json';
 import ml from './languages/ml.json';
 
+import { getCookie } from '@/lib/clientHelpers';
+
 const resources = {
   en: { translation: en },
   hi: { translation: hi },
@@ -25,7 +27,7 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: typeof window !== 'undefined' ? localStorage.getItem('preferredLanguage') || 'en' : 'en',
+    lng: typeof window !== 'undefined' ? (getCookie('preferredLanguage') || localStorage.getItem('preferredLanguage') || 'en') : 'en',
     fallbackLng: 'en',
     interpolation: {
       escapeValue: false,

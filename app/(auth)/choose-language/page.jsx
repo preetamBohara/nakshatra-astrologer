@@ -1,10 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from 'react-i18next';
 // import i18n from '../../i18n/i18n';
 import i18n from "../../../i18n/i18n"
+import { setCookies } from "@/lib/clientHelpers";
 
 const LANGUAGES = [
   { code: "en", label: "English" },
@@ -30,16 +31,28 @@ function CheckIcon(props) {
 export default function Page() {
   const router = useRouter();
   const { t } = useTranslation();
-  const [selected, setSelected] = useState("en");
+  const [mounted, setMounted] = useState(false);
+  const [selected, setSelected] = useState(i18n.language || "en");
+
+  useEffect(() => {
+    setMounted(true);
+    const currentLang = localStorage.getItem("preferredLanguage") || i18n.language || "en";
+    setSelected(currentLang);
+  }, []);
 
   function handleContinue() {
     try {
       localStorage.setItem("preferredLanguage", selected);
+      setCookies("preferredLanguage", selected, 60 * 60 * 24 * 365); // Save for 1 year
       i18n.changeLanguage(selected);
     } catch {
       /* ignore quota / private mode */
     }
     router.push("/login");
+  }
+
+  if (!mounted) {
+    return null;
   }
 
   return (
