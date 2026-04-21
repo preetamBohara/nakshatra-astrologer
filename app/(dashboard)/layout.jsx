@@ -1,14 +1,23 @@
-"use client";
+﻿"use client";
 
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
+import { fetchDashboardProfile } from "@/redux/slices/dashboardSlice";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function DashboardLayout({ children }) {
+  const dispatch = useDispatch();
+  const profileState = useSelector((state) => state.dashboard.profile);
   const pathname = usePathname();
   const [sidebarState, setSidebarState] = useState({ open: false, path: "" });
   const isSidebarOpen = sidebarState.open && sidebarState.path === pathname;
+
+  useEffect(() => {
+    if (profileState.loading || profileState.loaded) return;
+    void dispatch(fetchDashboardProfile());
+  }, [dispatch, profileState.loading, profileState.loaded]);
 
   return (
     <div className="h-full w-full overflow-hidden flex flex-col bg-red-50">
@@ -30,3 +39,5 @@ export default function DashboardLayout({ children }) {
     </div>
   );
 }
+
+

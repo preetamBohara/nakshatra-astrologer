@@ -1,19 +1,25 @@
-"use client";
+﻿"use client";
 
-import React from 'react'
+import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { useSelector } from "react-redux";
 
-const METRICS = [
-  { labelKey: "totalVoiceCalls", fallbackLabel: "Total Voice Calls", value: "1", change: "+80.00%", icon: "phone" },
-  { labelKey: "totalVideoCalls", fallbackLabel: "Total Video Calls", value: "0", change: "+0.00%", icon: "video" },
-  { labelKey: "totalChats", fallbackLabel: "Total Chats", value: "0", change: "+0.00%", icon: "bubble" },
-  { labelKey: "totalEarnings", fallbackLabel: "Total Earnings", value: "₹0", change: "+0.00%", icon: "rupee" },
-  { labelKey: "totalDuration", fallbackLabel: "Total Duration", value: "0s", change: "+0.00%", icon: "clock" },
-];
+function formatAnalyticsChange(raw) {
+  const n = Number(raw);
+  if (!Number.isFinite(n)) return { text: "+0.00%", tone: "neutral" };
+  const sign = n > 0 ? "+" : n < 0 ? "" : "+";
+  const text = `${sign}${n.toFixed(2)}%`;
+  const tone = n > 0 ? "up" : n < 0 ? "down" : "neutral";
+  return { text, tone };
+}
 
-
-
-
+function formatCountFromKpi(kpi) {
+  if (kpi == null) return "0";
+  const v = kpi.count !== undefined ? kpi.count : kpi.value;
+  const n = Number(v);
+  if (!Number.isFinite(n)) return "0";
+  return String(Math.trunc(n));
+}
 
 function MetricIcon({ name }) {
   const wrap = "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#FFF0E5] p-1.5 text-primary";
@@ -42,11 +48,11 @@ function MetricIcon({ name }) {
         </svg>
       </span>
     );
-  if (name === "rupee")
+  if (name === "star")
     return (
       <span className={wrap} aria-hidden>
-        <svg className={inner} width={20} height={20} viewBox="0 0 24 24" fill="currentColor">
-          <path d="M7 3h10v2H7V3Zm0 4h10v2H9.5c1.5 2 4 3.5 7 4v2c-3-.5-5.5-2-7-4v6h10v2H7v-6c0-2 1.5-3.5 3.5-4H7V7Z" />
+        <svg className={inner} width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+          <path d="M12 2.5 14.2 9h6.8l-5.5 4 2.1 6.5L12 16.9 6.4 19.5l2.1-6.5L3 9h6.8L12 2.5Z" />
         </svg>
       </span>
     );
@@ -61,28 +67,89 @@ function MetricIcon({ name }) {
 
 const Performance = () => {
   const { t } = useTranslation();
+  const analyticsState = useSelector((state) => state.dashboard.analytics);
+  const analytics = analyticsState.data?.analytics || null;
+  const isLoading = analyticsState.loading;
+
+  const metrics = useMemo(() => {
+    const a = analytics || {};
+    const voice = a.voiceCalls ?? a.voiceCall;
+    const video = a.videoCalls ?? a.videoCall;
+    const chat = a.chatCalls ?? a.totalChats ?? a.chat;
+    const rating = a.avgRating ?? a.averageRating ?? a.rating;
+    const duration = a.totalDuration ?? a.duration;
+
+    return [
+      {
+        labelKey: "totalVoiceCalls",
+        fallbackLabel: "Total Voice Calls",
+        icon: "phone",
+        value: formatCountFromKpi(voice),
+        change: formatAnalyticsChange(voice?.change),
+      },
+      {
+        labelKey: "totalVideoCalls",
+        fallbackLabel: "Total Video Calls",
+        icon: "video",
+        value: formatCountFromKpi(video),
+        change: formatAnalyticsChange(video?.change),
+      },
+      {
+        labelKey: "totalChats",
+        fallbackLabel: "Total Chats",
+        icon: "bubble",
+        value: formatCountFromKpi(chat),
+        change: formatAnalyticsChange(chat?.change),
+      },
+      {
+        labelKey: "avgRating",
+        fallbackLabel: "Avg. Rating",
+        icon: "star",
+        value: (() => {
+          const raw = rating?.value ?? rating?.count ?? rating;
+          if (raw == null || raw === "") return "-/5";
+          const s = String(raw).trim();
+          if (s.includes("/")) return s;
+          return `${s}/5`;
+        })(),
+        change: formatAnalyticsChange(rating?.change),
+      },
+      {
+        labelKey: "totalDuration",
+        fallbackLabel: "Total Duration",
+        icon: "clock",
+        value: duration?.value != null && duration.value !== "" ? String(duration.value) : "0s",
+        change: formatAnalyticsChange(duration?.change),
+      },
+    ];
+  }, [analytics]);
 
   return (
-    <>
-        <section>
-          <div className="flex flex-wrap gap-3 md:flex-nowrap md:justify-between">
-            {METRICS.map((m) => (
-              <div
-                key={m.labelKey}
-                className="flex min-w-35 flex-1 flex-col gap-2 rounded-2xl border border-[#EEE8F0] bg-white p-4 shadow-sm"
+    <section>
+      <div className="flex flex-wrap gap-3 md:flex-nowrap md:justify-between">
+        {metrics.map((m) => (
+          <div
+            key={m.labelKey}
+            className="flex min-w-35 flex-1 flex-col gap-2 rounded-2xl border border-[#EEE8F0] bg-white p-4 shadow-sm"
+          >
+            <div className="flex items-start justify-between gap-2">
+              <MetricIcon name={m.icon} />
+              <span
+                className={[
+                  "text-xs font-medium",
+                  m.change.tone === "up" ? "text-green-600" : m.change.tone === "down" ? "text-red-600" : "text-green-600",
+                ].join(" ")}
               >
-                <div className="flex items-start justify-between gap-2">
-                  <MetricIcon name={m.icon} />
-                  <span className="text-xs font-medium text-green-600">{m.change}</span>
-                </div>
-                <p className="text-xl font-semibold text-[#1a1a1a]">{m.value}</p>
-                <p className="text-xs leading-snug text-[#666]">{t(m.labelKey) || m.fallbackLabel}</p>
-              </div>
-            ))}
+                {isLoading ? "..." : m.change.text}
+              </span>
+            </div>
+            <p className="text-xl font-semibold text-[#1a1a1a]">{isLoading ? "..." : m.value}</p>
+            <p className="text-xs leading-snug text-[#666]">{t(m.labelKey) || m.fallbackLabel}</p>
           </div>
-        </section>
-    </>
-  )
-}
+        ))}
+      </div>
+    </section>
+  );
+};
 
-export default Performance
+export default Performance;

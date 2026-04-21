@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslation } from "react-i18next";
+import { useSelector } from "react-redux";
+import { getBackendImageUrl } from "@/lib/getBackendImageUrl";
 
 const MENU = [
   { labelKey: "dashboard", fallbackLabel: "Dashboard", icon: "home", href: "/" },
@@ -10,7 +12,7 @@ const MENU = [
   { labelKey: "payoutHistory", fallbackLabel: "Payout History", icon: "history", href: "/payout-history" },
   { labelKey: "reviewRatings", fallbackLabel: "Review & Ratings", icon: "user", href: "/review-ratings" },
   { labelKey: "blogs", fallbackLabel: "Blogs", icon: "doc", href: "/blogs" },
-  { labelKey: "createOffer", fallbackLabel: "Create Offer", icon: "help", href: "/create-offer" },
+  { labelKey: "offers", fallbackLabel: "Offers", icon: "offer", href: "/offers" },
   { labelKey: "sessions", fallbackLabel: "Sessions", icon: "chat", href: "/sessions" },
   { labelKey: "aboutUs", fallbackLabel: "About Us", icon: "user", href: "/about-us" },
   { labelKey: "privacyPolicy", fallbackLabel: "Privacy Policy", icon: "wallet", href: "/privacy-policy" },
@@ -70,8 +72,17 @@ function MenuIcon({ name }) {
   if (name === "help")
     return (
       <svg className={c} width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
-        <circle cx="12" cy="12" r="10" />
-        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01" />
+        <path d="M4 12a8 8 0 0 1 16 0" />
+        <rect x="3" y="12" width="4" height="6" rx="2" />
+        <rect x="17" y="12" width="4" height="6" rx="2" />
+        <path d="M7 20h6a3 3 0 0 0 3-3" />
+      </svg>
+    );
+  if (name === "offer")
+    return (
+      <svg className={c} width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
+        <path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3.4 13.4a2 2 0 0 1 0-2.8L10.6 3.4a2 2 0 0 1 1.4-.6H19a2 2 0 0 1 2 2v7a2 2 0 0 1-.6 1.4Z" />
+        <circle cx="16" cy="8" r="1.3" />
       </svg>
     );
   return (
@@ -84,22 +95,34 @@ function MenuIcon({ name }) {
 const Sidebar = ({ isOpen = false, onClose }) => {
   const pathname = usePathname();
   const { t } = useTranslation();
+  const profile = useSelector((state) => state.dashboard.profile.data);
+
+  const displayName = profile?.fullName || profile?.name || "Girish sharma";
+  const displayId = profile?.astroId || "â€”";
+  const followerCount = Array.isArray(profile?.followers)
+    ? profile.followers.length
+    : profile?.followersCount ?? profile?.followers ?? 0;
+  const profileImagePath = profile?.image ? getBackendImageUrl(profile.image) : "";
 
   return (
     <>
         <aside
           className={[
-            "fixed inset-y-0 left-0 z-40 flex w-55 shrink-0 flex-col border-r border-[#E8E4EC] bg-white transition-transform duration-200 ease-out md:w-62.5 lg:static lg:z-auto lg:translate-x-0",
+            "fixed inset-y-0 left-0 z-40 flex w-55 shrink-0 flex-col border-r border-primary/15 bg-white transition-transform duration-200 ease-out md:w-62.5 lg:static lg:z-auto lg:translate-x-0",
             isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
           ].join(" ")}
         >
-          <div className="m-3 rounded-2xl bg-[#FFF0E5] p-4">
+          <div className="m-3 rounded-2xl border border-primary/20 bg-white p-4">
             <div className="flex gap-3">
-              <div className="h-14 w-14 shrink-0 overflow-hidden rounded-full bg-[#E8D5CC]" />
+              <div className="h-14 w-14 shrink-0 overflow-hidden rounded-full border border-primary/25 bg-primary-light">
+                {profileImagePath ? (
+                  <img src={profileImagePath} alt="Profile" className="h-full w-full object-cover" />
+                ) : null}
+              </div>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold text-[#1a1a1a]">Girish sharma</p>
-                <p className="text-xs text-[#666]">ID: —</p>
-                <p className="text-xs text-[#666]">Followers: 0</p>
+                <p className="truncate text-sm font-semibold text-[#1a1a1a]">{displayName}</p>
+                <p className="text-xs text-primary/80 line-clamp-1">{`ID: ${displayId}`}</p>
+                <p className="text-xs text-primary/80">{`Followers: ${followerCount}`}</p>
               </div>
             </div>
           </div>
@@ -112,15 +135,15 @@ const Sidebar = ({ isOpen = false, onClose }) => {
                 className={[
                   "flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-3 text-left text-sm transition-colors",
                   isActivePath(pathname, item.href)
-                    ? "bg-[#FFF0E5] font-medium text-[#1a1a1a]"
-                    : "text-[#444] hover:bg-[#F8F6FA]",
+                    ? "bg-primary/12 font-medium text-primary"
+                    : "text-[#444] hover:bg-primary/8 hover:text-primary",
                 ].join(" ")}
               >
                 <MenuIcon name={item.icon} />
                 <span className="flex-1">{t(item.labelKey) || item.fallbackLabel}</span>
                 {item.badge === "check" ? (
                   <span className="text-green-600" aria-hidden>
-                    ✓
+                    âœ“
                   </span>
                 ) : null}
               </Link>
