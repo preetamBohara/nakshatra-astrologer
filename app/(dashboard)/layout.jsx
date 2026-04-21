@@ -7,6 +7,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import AadharVerificationModal from "@/components/common/AadharVerificationModal";
+import PanVerificationModal from "@/components/common/PanVerificationModal";
+import BankVerificationModal from "@/components/common/BankVerificationModal";
 
 const ALLOWED_UNVERIFIED_ROUTES = [
   "/",
@@ -33,13 +35,17 @@ export default function DashboardLayout({ children }) {
   }, [dispatch, profileState.loading, profileState.loaded]);
 
   const isProfileLoaded = profileState.loaded && profileState.data !== null;
-  const isAadharVerified = isProfileLoaded ? Boolean(profileState.data?.documents?.aadharCard) : true;
+  const isAadharVerified = isProfileLoaded ? Boolean(profileState.data?.documents?.aadharCard?.status === 1) : true;
+  const isPanVerified = isProfileLoaded ? Boolean(profileState.data?.documents?.panCard?.status === 1) : true;
+  const isBankVerified = isProfileLoaded ? Boolean(profileState.data?.bankDetails?.accountNumber || profileState.data?.bankDetails?.accountNo) : true;
+  
+  const isVerified = isAadharVerified && isPanVerified && isBankVerified;
   
   const isCurrentRouteAllowed = ALLOWED_UNVERIFIED_ROUTES.some(
     (route) => pathname === route || (route !== "/" && pathname.startsWith(`${route}/`))
   );
 
-  const blockAccess = isProfileLoaded && !isAadharVerified && !isCurrentRouteAllowed;
+  const blockAccess = isProfileLoaded && !isVerified && !isCurrentRouteAllowed;
 
   return (
     <div className="h-full w-full overflow-hidden flex flex-col bg-red-50">
@@ -60,8 +66,14 @@ export default function DashboardLayout({ children }) {
                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
               <h2 className="text-xl font-semibold mb-2">Restricted Access</h2>
-              <p>Please complete your Aadhar verification to access this page.</p>
-              <AadharVerificationModal isOpen={true} onClose={() => router.replace("/")} />
+              <p>Please complete your {!isAadharVerified ? "Aadhar" : !isPanVerified ? "PAN" : "Bank"} verification to access this page.</p>
+              {!isAadharVerified ? (
+                <AadharVerificationModal isOpen={true} onClose={() => router.replace("/")} />
+              ) : !isPanVerified ? (
+                <PanVerificationModal isOpen={true} onClose={() => router.replace("/")} />
+              ) : (
+                <BankVerificationModal isOpen={true} onClose={() => router.replace("/")} />
+              )}
             </div>
           ) : (
             children

@@ -31,7 +31,8 @@ export const API_ENDPOINTS = {
   MARK_NOTIFICATION_READ: "/api/astrologer/mark-notification-read",
 
   VERIFY_AADHAR:"/api/astrologer/verify-aadhar",
-
+  VERIFY_AADHAR_OTP:"/api/astrologer/verify-aadhar-otp",
+  VERIFY_PAN:"/api/astrologer/verify-pan",
 
   // Logout
   LOGOUT:"/api/astrologer/logout"

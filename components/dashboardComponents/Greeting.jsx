@@ -7,6 +7,8 @@ import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchDailyStats, updateAstrologerServices, updateOnlineStatus } from "@/redux/slices/dashboardSlice";
 import AadharVerificationModal from "@/components/common/AadharVerificationModal";
+import PanVerificationModal from "@/components/common/PanVerificationModal";
+import BankVerificationModal from "@/components/common/BankVerificationModal";
 function getServiceFlags(profile) {
   return {
     isChatting: Boolean(profile?.isChatting),
@@ -24,6 +26,8 @@ const Greeting = () => {
   const { t } = useTranslation();
   const profile = useSelector((state) => state.dashboard.profile.data);
   const [isAadharModalOpen, setIsAadharModalOpen] = React.useState(false);
+  const [isPanModalOpen, setIsPanModalOpen] = React.useState(false);
+  const [isBankModalOpen, setIsBankModalOpen] = React.useState(false);
   const dailyStatsState = useSelector((state) => state.dashboard.dailyStats);
   const dailyStats = dailyStatsState?.data || {};
   const summary = dailyStats?.summary || {};
@@ -57,8 +61,16 @@ const Greeting = () => {
   ];
 
   const handleStatusToggle = async () => {
-    if (!profile?.documents?.aadharCard) {
+    if (profile?.documents?.aadharCard?.status !== 1) {
       setIsAadharModalOpen(true);
+      return;
+    }
+    if (profile?.documents?.panCard?.status !== 1) {
+      setIsPanModalOpen(true);
+      return;
+    }
+    if (!(profile?.bankDetails?.accountNumber || profile?.bankDetails?.accountNo)) {
+      setIsBankModalOpen(true);
       return;
     }
     const nextStatus = !isOnline;
@@ -74,8 +86,16 @@ const Greeting = () => {
   };
 
   const handleServiceToggle = async (serviceKey) => {
-    if (!profile?.documents?.aadharCard) {
+    if (profile?.documents?.aadharCard?.status !== 1) {
       setIsAadharModalOpen(true);
+      return;
+    }
+    if (profile?.documents?.panCard?.status !== 1) {
+      setIsPanModalOpen(true);
+      return;
+    }
+    if (!(profile?.bankDetails?.accountNumber || profile?.bankDetails?.accountNo)) {
+      setIsBankModalOpen(true);
       return;
     }
     if (!isOnline) {
@@ -203,6 +223,26 @@ const Greeting = () => {
       <AadharVerificationModal
         isOpen={isAadharModalOpen}
         onClose={() => setIsAadharModalOpen(false)}
+        onSuccess={() => {
+          setIsAadharModalOpen(false);
+          if (profile?.documents?.panCard?.status !== 1) {
+            setIsPanModalOpen(true);
+          }
+        }}
+      />
+      <PanVerificationModal
+        isOpen={isPanModalOpen}
+        onClose={() => setIsPanModalOpen(false)}
+        onSuccess={() => {
+          setIsPanModalOpen(false);
+          if (!(profile?.bankDetails?.accountNumber || profile?.bankDetails?.accountNo)) {
+            setIsBankModalOpen(true);
+          }
+        }}
+      />
+      <BankVerificationModal
+        isOpen={isBankModalOpen}
+        onClose={() => setIsBankModalOpen(false)}
       />
     </>
   );

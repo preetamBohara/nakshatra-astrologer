@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import AadharVerificationModal from "@/components/common/AadharVerificationModal";
+import PanVerificationModal from "@/components/common/PanVerificationModal";
+import BankVerificationModal from "@/components/common/BankVerificationModal";
 
 function CardIcon({ type }) {
   const wrapperClass = "inline-flex h-13 w-13 shrink-0 items-center justify-center rounded-xl bg-primary-light text-primary";
@@ -68,109 +70,15 @@ function StatusBadge({ status }) {
   );
 }
 
-function BankDetailsModal({ isOpen, onClose, onSave, form, onChange }) {
-  const { t } = useTranslation();
 
-  useEffect(() => {
-    if (!isOpen) return undefined;
-    const handleEsc = (event) => {
-      if (event.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", handleEsc);
-    return () => window.removeEventListener("keydown", handleEsc);
-  }, [isOpen, onClose]);
-
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <button
-        type="button"
-        onClick={onClose}
-        aria-label={t("close") || "Close bank details modal"}
-        className="absolute inset-0 cursor-pointer bg-black/45"
-      />
-
-      <div className="relative z-10 flex h-[min(620px,80vh)] w-full max-w-[480px] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
-        <div className="flex items-center justify-between border-b border-[#E2E2E2] px-5 py-4">
-          <h2 className="text-xl font-semibold text-[#2F2F2F]">{t("bankDetails") || "Bank Details"}</h2>
-          <button
-            type="button"
-            onClick={onClose}
-            className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-[#2E2E2E] hover:bg-[#F6F3F6]"
-            aria-label={t("close") || "Close"}
-          >
-            <svg className="h-5 w-5" width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="m5 5 14 14M19 5 5 19" />
-            </svg>
-          </button>
-        </div>
-
-        <div className="flex-1 overflow-y-auto px-5 py-5">
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="account-holder-name" className="mb-1.5 block text-sm font-medium text-[#3A3A3A]">
-                {t("accountHolderName") || "Account Holder Name"}
-              </label>
-              <input
-                id="account-holder-name"
-                type="text"
-                value={form.holderName}
-                onChange={(event) => onChange("holderName", event.target.value)}
-                className="h-[46px] w-full rounded-xl border border-[#BBBBBB] px-3.5 text-sm uppercase text-[#333] outline-none"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="account-number" className="mb-1.5 block text-sm font-medium text-[#3A3A3A]">
-                {t("accountNumber") || "Account Number"}
-              </label>
-              <input
-                id="account-number"
-                type="text"
-                inputMode="numeric"
-                value={form.accountNumber}
-                onChange={(event) => onChange("accountNumber", event.target.value.replace(/\D/g, ""))}
-                className="h-[46px] w-full rounded-xl border border-[#BBBBBB] px-3.5 text-sm text-[#333] outline-none"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="ifsc-code" className="mb-1.5 block text-sm font-medium text-[#3A3A3A]">
-                {t("ifscCode") || "IFSC Code"}
-              </label>
-              <input
-                id="ifsc-code"
-                type="text"
-                value={form.ifsc}
-                onChange={(event) => onChange("ifsc", event.target.value.toUpperCase())}
-                className="h-[46px] w-full rounded-xl border border-[#BBBBBB] px-3.5 text-sm uppercase text-[#333] outline-none"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="border-t border-[#E2E2E2] px-5 py-4">
-          <button
-            type="button"
-            onClick={onSave}
-            className="h-[44px] w-full cursor-pointer rounded-xl bg-[#E5623F] text-sm font-semibold text-white hover:opacity-95"
-          >
-            {t("save") || "Save"}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export default function KycDetailsPage() {
   const { t } = useTranslation();
   const profile = useSelector((state) => state.dashboard.profile.data);
   const [activeTab, setActiveTab] = useState("aadhar");
   const [isAadharModalOpen, setIsAadharModalOpen] = useState(false);
+  const [isPanModalOpen, setIsPanModalOpen] = useState(false);
   const [isBankModalOpen, setIsBankModalOpen] = useState(false);
-  const [bankForm, setBankForm] = useState({ holderName: "", accountNumber: "", ifsc: "" });
 
   const documents = profile?.documents || {};
   const aadharDoc = documents?.aadharCard;
@@ -202,7 +110,7 @@ export default function KycDetailsPage() {
       value: maskAadhar(aadharDoc?.number || aadharDoc?.aadharNumber || aadharDoc),
       icon: "fingerprint",
       isAvailable: Boolean(aadharDoc),
-      status: aadharDoc?.status === 1 ? "approved" : aadharDoc ? "pending" : "missing",
+      status: aadharDoc?.status === 1 ? "approved" : (aadharDoc?.status === 0 ? "missing" : (aadharDoc ? "pending" : "missing")),
     },
     {
       id: "pan",
@@ -210,7 +118,7 @@ export default function KycDetailsPage() {
       value: maskPan(panDoc?.number || panDoc?.panNumber || panDoc),
       icon: "briefcase",
       isAvailable: Boolean(panDoc),
-      status: panDoc?.status === 1 ? "approved" : panDoc ? "pending" : "missing",
+      status: panDoc?.status === 1 ? "approved" : (panDoc?.status === 0 ? "missing" : (panDoc ? "pending" : "missing")),
     },
     {
       id: "bank",
@@ -218,7 +126,7 @@ export default function KycDetailsPage() {
       value: bankLabel,
       icon: "bank",
       isAvailable: Boolean(bankDetails && (bankDetails?.accountNumber || bankDetails?.accountNo || bankDetails?.ifscCode)),
-      status: bankDetails?.isVerified ? "approved" : bankDetails ? "pending" : "missing",
+      status: bankDetails?.isVerified ? "approved" : (bankDetails?.status === 0 ? "missing" : (bankDetails ? "pending" : "missing")),
     },
   ];
 
@@ -292,7 +200,7 @@ export default function KycDetailsPage() {
              </span>
              <h2 className="text-xl font-semibold leading-tight text-[#35353B]">Need to verify PAN?</h2>
              <p className="mt-3 max-w-sm text-[14px] leading-relaxed text-[#777785]">Verify your PAN card to ensure taxation compliance and secure transactions.</p>
-             <button onClick={() => setIsAadharModalOpen(true)} className="mt-8 inline-flex h-[42px] px-8 items-center justify-center rounded-full bg-primary text-[15px] font-semibold text-white shadow-[0_8px_20px_rgba(209,0,90,0.2)] hover:opacity-95">Verify PAN</button>
+             <button onClick={() => setIsPanModalOpen(true)} className="mt-8 inline-flex h-[42px] px-8 items-center justify-center rounded-full bg-primary text-[15px] font-semibold text-white shadow-[0_8px_20px_rgba(209,0,90,0.2)] hover:opacity-95">Verify PAN</button>
          </div>
       );
     }
@@ -387,16 +295,19 @@ export default function KycDetailsPage() {
           </div>
         </div>
 
-        <BankDetailsModal
+        <PanVerificationModal
+          isOpen={isPanModalOpen}
+          onClose={() => setIsPanModalOpen(false)}
+          onSuccess={() => {
+            setIsPanModalOpen(false);
+            if (!(profile?.bankDetails?.accountNumber || profile?.bankDetails?.accountNo)) {
+              setIsBankModalOpen(true);
+            }
+          }}
+        />
+        <BankVerificationModal
           isOpen={isBankModalOpen}
           onClose={() => setIsBankModalOpen(false)}
-          onSave={() => setIsBankModalOpen(false)}
-          form={bankForm}
-          onChange={(key, value) => setBankForm((prev) => ({ ...prev, [key]: value }))}
-        />
-        <AadharVerificationModal 
-          isOpen={isAadharModalOpen} 
-          onClose={() => setIsAadharModalOpen(false)} 
         />
       </section>
     </>

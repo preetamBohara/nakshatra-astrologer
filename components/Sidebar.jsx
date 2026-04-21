@@ -6,8 +6,12 @@ import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { getBackendImageUrl } from "@/lib/getBackendImageUrl";
 import AadharVerificationModal from "@/components/common/AadharVerificationModal";
+import PanVerificationModal from "@/components/common/PanVerificationModal";
+import BankVerificationModal from "@/components/common/BankVerificationModal";
 import LogoutModal from "@/components/common/LogoutModal";
 import { removeCookie } from "@/lib/clientHelpers";
+import { postAPIAuth, getAPIAuth } from "@/lib/apiServices";
+import { API_ENDPOINTS } from "@/constants/apiConstants";
 import React, { useState } from "react";
 
 const MENU = [
@@ -101,11 +105,21 @@ const Sidebar = ({ isOpen = false, onClose }) => {
   const { t } = useTranslation();
   const profile = useSelector((state) => state.dashboard.profile.data);
   const [isAadharModalOpen, setIsAadharModalOpen] = useState(false);
+  const [isPanModalOpen, setIsPanModalOpen] = useState(false);
+  const [isBankModalOpen, setIsBankModalOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
-  const handleLogoutConfirm = () => {
-    removeCookie("authToken");
-    window.location.replace("/login");
+  const handleLogoutConfirm = async () => {
+    try {
+      // Attempt POST standard logout, fallback to GET if the backend expects different method
+      await postAPIAuth(API_ENDPOINTS.LOGOUT, {}).catch(() => getAPIAuth(API_ENDPOINTS.LOGOUT));
+    } catch (error) {
+      console.error("Logout API failed:", error);
+    } finally {
+      removeCookie("authToken");
+      // A hard redirect completely flushes the Redux state and Javascript memory cache
+      window.location.replace("/login");
+    }
   };
 
   const displayName = profile?.fullName || profile?.name || "Girish sharma";
@@ -155,9 +169,19 @@ const Sidebar = ({ isOpen = false, onClose }) => {
                       return;
                     }
 
-                    if (!profile?.documents?.aadharCard && !isAllowedIfUnverified) {
+                    if (profile?.documents?.aadharCard?.status !== 1 && !isAllowedIfUnverified) {
                       e.preventDefault();
                       setIsAadharModalOpen(true);
+                      return;
+                    }
+                    if (profile?.documents?.panCard?.status !== 1 && !isAllowedIfUnverified) {
+                      e.preventDefault();
+                      setIsPanModalOpen(true);
+                      return;
+                    }
+                    if (!(profile?.bankDetails?.accountNumber || profile?.bankDetails?.accountNo) && !isAllowedIfUnverified) {
+                      e.preventDefault();
+                      setIsBankModalOpen(true);
                       return;
                     }
                     if (onClose) onClose();
@@ -185,6 +209,26 @@ const Sidebar = ({ isOpen = false, onClose }) => {
         <AadharVerificationModal
           isOpen={isAadharModalOpen}
           onClose={() => setIsAadharModalOpen(false)}
+          onSuccess={() => {
+            setIsAadharModalOpen(false);
+            if (profile?.documents?.panCard?.status !== 1) {
+              setIsPanModalOpen(true);
+            }
+          }}
+        />
+        <PanVerificationModal
+          isOpen={isPanModalOpen}
+          onClose={() => setIsPanModalOpen(false)}
+          onSuccess={() => {
+            setIsPanModalOpen(false);
+            if (!(profile?.bankDetails?.accountNumber || profile?.bankDetails?.accountNo)) {
+              setIsBankModalOpen(true);
+            }
+          }}
+        />
+        <BankVerificationModal
+          isOpen={isBankModalOpen}
+          onClose={() => setIsBankModalOpen(false)}
         />
         <LogoutModal
           isOpen={isLogoutModalOpen}
