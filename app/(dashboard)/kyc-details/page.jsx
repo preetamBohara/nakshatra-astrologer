@@ -222,14 +222,7 @@ export default function KycDetailsPage() {
                </div>
              </div>
              <div className="p-6 pt-0 mt-4">
-               <button onClick={() => {
-                  setBankForm({
-                    holderName: bankDetails?.accountHolderName || bankDetails?.holderName || "",
-                    accountNumber: String(bankDetails?.accountNumber || bankDetails?.accountNo || ""),
-                    ifsc: bankDetails?.ifscCode || "",
-                  });
-                  setIsBankModalOpen(true);
-                }} className="inline-flex h-[44px] px-8 items-center justify-center rounded-xl bg-[#FFF5F2] border border-[#fddbd0] text-[15px] font-semibold text-primary shadow-sm hover:bg-[#ffece6] transition-colors w-full">Update Bank Details</button>
+               <button onClick={() => setIsBankModalOpen(true)} className="inline-flex h-[44px] px-8 items-center justify-center rounded-xl bg-[#FFF5F2] border border-[#fddbd0] text-[15px] font-semibold text-primary shadow-sm hover:bg-[#ffece6] transition-colors w-full">Update Bank Details</button>
              </div>
           </div>
          );
@@ -308,6 +301,7 @@ export default function KycDetailsPage() {
         <BankVerificationModal
           isOpen={isBankModalOpen}
           onClose={() => setIsBankModalOpen(false)}
+          isEditMode={true}
         />
       </section>
     </>

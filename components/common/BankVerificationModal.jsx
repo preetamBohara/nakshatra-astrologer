@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
-import { patchAPIAuth } from "@/lib/apiServices";
+import { patchAPIAuth, postAPIAuth } from "@/lib/apiServices";
 import { API_ENDPOINTS } from "@/constants/apiConstants";
 import { fetchDashboardProfile } from "@/redux/slices/dashboardSlice";
 
-export default function BankVerificationModal({ isOpen, onClose }) {
+export default function BankVerificationModal({ isOpen, onClose, isEditMode = false }) {
   const [holderName, setHolderName] = useState("");
   const [accountNumber, setAccountNumber] = useState("");
   const [confirmAccountNumber, setConfirmAccountNumber] = useState("");
@@ -15,15 +15,27 @@ export default function BankVerificationModal({ isOpen, onClose }) {
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
 
-  // Resetting state when modal is closed
+  const loadingState = useSelector((state) => state.dashboard.profile.loading);
+  const profile = useSelector((state) => state.dashboard.profile.data);
+
+  // Pre-fill or reset state when modal opens/closes
   useEffect(() => {
-    if (!isOpen) {
+    if (isOpen && isEditMode) {
+      if (profile?.bankDetails) {
+        const bd = profile.bankDetails;
+        setHolderName(bd.accountHolderName || bd.holderName || "");
+        const accNum = String(bd.accountNumber || bd.accountNo || "");
+        setAccountNumber(accNum);
+        setConfirmAccountNumber(accNum);
+        setIfsc(bd.ifscCode || bd.ifsc || "");
+      }
+    } else if (!isOpen) {
       setHolderName("");
       setAccountNumber("");
       setConfirmAccountNumber("");
       setIfsc("");
     }
-  }, [isOpen]);
+  }, [isOpen, profile, isEditMode]);
 
   if (!isOpen) return null;
 
@@ -43,12 +55,9 @@ export default function BankVerificationModal({ isOpen, onClose }) {
     setLoading(true);
     try {
       // Using UPDATE_ASTROLOGER_DETAIL as the endpoint to save bank details
-      const response = await patchAPIAuth(API_ENDPOINTS.UPDATE_ASTROLOGER_DETAIL, {
-        bankDetails: {
-          accountHolderName: holderName,
-          accountNumber: accountNumber,
-          ifscCode: ifsc,
-        },
+      const response = await postAPIAuth(API_ENDPOINTS.VERIFY_BANK, {
+        accountNumber: accountNumber,
+        ifsc: ifsc,
       });
 
       if (response?.data?.status) {

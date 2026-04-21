@@ -33,6 +33,7 @@ export const API_ENDPOINTS = {
   VERIFY_AADHAR:"/api/astrologer/verify-aadhar",
   VERIFY_AADHAR_OTP:"/api/astrologer/verify-aadhar-otp",
   VERIFY_PAN:"/api/astrologer/verify-pan",
+  VERIFY_BANK:"/api/astrologer/verify-bank",
 
   // Logout
   LOGOUT:"/api/astrologer/logout"
