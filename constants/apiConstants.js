@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 // const API_FALLBACK_URL = "http://3.108.130.191:7005";
 const API_FALLBACK_URL = "https://astrologer.nakshatraai.ai";
 
@@ -30,18 +29,10 @@ export const API_ENDPOINTS = {
   DELETE_OFFER: "/api/astrologer/delete-offer",
   NOTIFICATIONS: "/api/astrologer/notifications",
   MARK_NOTIFICATION_READ: "/api/astrologer/mark-notification-read",
-=======
-const API_FALLBACK_URL = "https://astrologer.nakshatraai.ai";
 
-export const BASE_URL = (process.env.NEXT_PUBLIC_API_URL || API_FALLBACK_URL).replace(/\/$/, "");
+  VERIFY_AADHAR:"/api/astrologer/verify-aadhar",
 
-export const API_ENDPOINTS = {
-  LOGIN_WITH_MOBILE: "/api/astrologer/loginwithmobile",
-  VERIFY_OTP: "/api/astrologer/verifyotp",
-  RESEND_OTP: "/api/astrologer/resendotp",
-  REGISTRATION_SEND_OTP: "/api/astrologer/registration-send-otp",
-  REGISTRATION_VERIFY_OTP: "/api/astrologer/registration-verify-otp",
-  REGISTER: "/api/astrologer/register",
-  GET_LISTING: "/api/astrologer/get-listing",
->>>>>>> 2f614ca440eee91178a05d50113f8481184eecff
+
+  // Logout
+  LOGOUT:"/api/astrologer/logout"
 };
