@@ -179,7 +179,7 @@ const Sidebar = ({ isOpen = false, onClose }) => {
                       setIsPanModalOpen(true);
                       return;
                     }
-                    if (!(profile?.bankDetails?.accountNumber || profile?.bankDetails?.accountNo) && !isAllowedIfUnverified) {
+                    if (!profile?.bankDetails?.isVerified && !isAllowedIfUnverified) {
                       e.preventDefault();
                       setIsBankModalOpen(true);
                       return;
@@ -221,7 +221,7 @@ const Sidebar = ({ isOpen = false, onClose }) => {
           onClose={() => setIsPanModalOpen(false)}
           onSuccess={() => {
             setIsPanModalOpen(false);
-            if (!(profile?.bankDetails?.accountNumber || profile?.bankDetails?.accountNo)) {
+            if (!profile?.bankDetails?.isVerified) {
               setIsBankModalOpen(true);
             }
           }}

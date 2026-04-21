@@ -37,7 +37,7 @@ export default function DashboardLayout({ children }) {
   const isProfileLoaded = profileState.loaded && profileState.data !== null;
   const isAadharVerified = isProfileLoaded ? Boolean(profileState.data?.documents?.aadharCard?.status === 1) : true;
   const isPanVerified = isProfileLoaded ? Boolean(profileState.data?.documents?.panCard?.status === 1) : true;
-  const isBankVerified = isProfileLoaded ? Boolean(profileState.data?.bankDetails?.accountNumber || profileState.data?.bankDetails?.accountNo) : true;
+  const isBankVerified = isProfileLoaded ? Boolean(profileState.data?.bankDetails?.isVerified) : true;
   
   const isVerified = isAadharVerified && isPanVerified && isBankVerified;
   

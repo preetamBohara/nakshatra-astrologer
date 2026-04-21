@@ -293,7 +293,7 @@ export default function KycDetailsPage() {
           onClose={() => setIsPanModalOpen(false)}
           onSuccess={() => {
             setIsPanModalOpen(false);
-            if (!(profile?.bankDetails?.accountNumber || profile?.bankDetails?.accountNo)) {
+            if (!profile?.bankDetails?.isVerified) {
               setIsBankModalOpen(true);
             }
           }}

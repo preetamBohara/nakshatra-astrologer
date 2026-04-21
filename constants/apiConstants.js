@@ -30,11 +30,18 @@ export const API_ENDPOINTS = {
   NOTIFICATIONS: "/api/astrologer/notifications",
   MARK_NOTIFICATION_READ: "/api/astrologer/mark-notification-read",
 
+  //Verification Apis
   VERIFY_AADHAR:"/api/astrologer/verify-aadhar",
   VERIFY_AADHAR_OTP:"/api/astrologer/verify-aadhar-otp",
   VERIFY_PAN:"/api/astrologer/verify-pan",
   VERIFY_BANK:"/api/astrologer/verify-bank",
 
-  // Logout
+  //Blogs Apis
+  GET_BLOGS: "/api/astrologer/get-blogs",
+  CREATE_BLOG: "/api/astrologer/create-blog",
+  DELETE_BLOG: "/api/astrologer/delete-blog",
+  EDIT_BLOG: "/api/astrologer/update-blog",
+
+  // Logout Api
   LOGOUT:"/api/astrologer/logout"
 };

@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { API_ENDPOINTS } from "@/constants/apiConstants";
-import { deleteAPIAuth, getAPIAuth, patchAPIAuth, postAPIAuth } from "@/lib/apiServices";
+import { deleteAPIAuth, getAPIAuth, patchAPIAuth, postAPIAuth, putAPIAuth } from "@/lib/apiServices";
 
 function getPayloadProfile(payload) {
   if (!payload || typeof payload !== "object") return null;
@@ -244,6 +244,52 @@ export const updateAstrologerServices = createAsyncThunk(
   },
 );
 
+//Blogs Reducers
+export const fetchBlogs = createAsyncThunk("dashboard/fetchBlogs", async (_, { rejectWithValue }) => {
+  try {
+    const response = await getAPIAuth(API_ENDPOINTS.GET_BLOGS);
+    const blogs = Array.isArray(response?.data?.data) ? response.data.data : [];
+    return blogs;
+  } catch (error) {
+    return rejectWithValue(getErrorMessage(error));
+  }
+});
+
+export const createBlog = createAsyncThunk("dashboard/createBlog", async (payload, { rejectWithValue }) => {
+  try {
+    const response = await postAPIAuth(API_ENDPOINTS.CREATE_BLOG, payload);
+    return {
+      message: pickApiMessage(response?.data),
+      data: getPayloadData(response?.data),
+    };
+  } catch (error) {
+    return rejectWithValue(getErrorMessage(error));
+  }
+});
+
+export const editBlog = createAsyncThunk("dashboard/editBlog", async ({ blogId, payload }, { rejectWithValue }) => {
+  try {
+    const response = await putAPIAuth(`${API_ENDPOINTS.EDIT_BLOG}/${blogId}`, payload);
+    return {
+      message: pickApiMessage(response?.data),
+      data: getPayloadData(response?.data),
+    };
+  } catch (error) {
+    return rejectWithValue(getErrorMessage(error));
+  }
+});
+
+export const deleteBlog = createAsyncThunk("dashboard/deleteBlog", async (blogId, { rejectWithValue }) => {
+  try {
+    const response = await deleteAPIAuth(`${API_ENDPOINTS.DELETE_BLOG}/${blogId}`);
+    return {
+      message: pickApiMessage(response?.data),
+    };
+  } catch (error) {
+    return rejectWithValue(getErrorMessage(error));
+  }
+});
+
 const initialState = {
   profile: {
     loading: false,
@@ -320,6 +366,24 @@ const initialState = {
     totalPages: 1,
   },
   offerDelete: {
+    loading: false,
+    error: null,
+  },
+  blogs: {
+    loading: false,
+    loaded: false,
+    error: null,
+    data: [],
+  },
+  blogCreate: {
+    loading: false,
+    error: null,
+  },
+  blogEdit: {
+    loading: false,
+    error: null,
+  },
+  blogDelete: {
     loading: false,
     error: null,
   },
@@ -553,7 +617,58 @@ const dashboardSlice = createSlice({
       .addCase(updateAstrologerServices.rejected, (state, action) => {
         state.serviceUpdate.loading = false;
         state.serviceUpdate.error = action.payload || "Unable to update service status";
-      });
+      })
+       .addCase(fetchBlogs.pending, (state) => {
+        state.blogs.loading = true;
+        state.blogs.error = null;
+      })
+      .addCase(fetchBlogs.fulfilled, (state, action) => {
+        state.blogs.loading = false;
+        state.blogs.loaded = true;
+        state.blogs.error = null;
+        state.blogs.data = Array.isArray(action.payload) ? action.payload : [];
+      })
+      .addCase(fetchBlogs.rejected, (state, action) => {
+        state.blogs.loading = false;
+        state.blogs.loaded = true;
+        state.blogs.error = action.payload || "Unable to load blogs";
+      })
+      .addCase(createBlog.pending, (state) => {
+        state.blogCreate.loading = true;
+        state.blogCreate.error = null;
+      })
+      .addCase(createBlog.fulfilled, (state) => {
+        state.blogCreate.loading = false;
+        state.blogCreate.error = null;
+      })
+      .addCase(createBlog.rejected, (state, action) => {
+        state.blogCreate.loading = false;
+        state.blogCreate.error = action.payload || "Unable to create blog";
+      })
+      .addCase(editBlog.pending, (state) => {
+        state.blogEdit.loading = true;
+        state.blogEdit.error = null;
+      })
+      .addCase(editBlog.fulfilled, (state) => {
+        state.blogEdit.loading = false;
+        state.blogEdit.error = null;
+      })
+      .addCase(editBlog.rejected, (state, action) => {
+        state.blogEdit.loading = false;
+        state.blogEdit.error = action.payload || "Unable to edit blog";
+      })
+      .addCase(deleteBlog.pending, (state) => {
+        state.blogDelete.loading = true;
+        state.blogDelete.error = null;
+      })
+      .addCase(deleteBlog.fulfilled, (state) => {
+        state.blogDelete.loading = false;
+        state.blogDelete.error = null;
+      })
+      .addCase(deleteBlog.rejected, (state, action) => {
+        state.blogDelete.loading = false;
+        state.blogDelete.error = action.payload || "Unable to delete blog";
+      })
   },
 });
 

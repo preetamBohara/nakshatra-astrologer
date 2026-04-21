@@ -69,7 +69,7 @@ const Greeting = () => {
       setIsPanModalOpen(true);
       return;
     }
-    if (!(profile?.bankDetails?.accountNumber || profile?.bankDetails?.accountNo)) {
+    if (!profile?.bankDetails?.isVerified) {
       setIsBankModalOpen(true);
       return;
     }
@@ -94,7 +94,7 @@ const Greeting = () => {
       setIsPanModalOpen(true);
       return;
     }
-    if (!(profile?.bankDetails?.accountNumber || profile?.bankDetails?.accountNo)) {
+    if (!profile?.bankDetails?.isVerified) {
       setIsBankModalOpen(true);
       return;
     }
@@ -235,7 +235,7 @@ const Greeting = () => {
         onClose={() => setIsPanModalOpen(false)}
         onSuccess={() => {
           setIsPanModalOpen(false);
-          if (!(profile?.bankDetails?.accountNumber || profile?.bankDetails?.accountNo)) {
+          if (!profile?.bankDetails?.isVerified) {
             setIsBankModalOpen(true);
           }
         }}
