@@ -145,7 +145,11 @@ export function useOtp() {
       const code = otp.join("");
       const userAgent = navigator.userAgent.toLowerCase();
       const deviceName = userAgent.includes("chrome") ? "chrome" : "browser";
-      const deviceId = navigator.vendor || "web";
+      let deviceId = localStorage.getItem("deviceId");
+      if (!deviceId) {
+        deviceId = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
+        localStorage.setItem("deviceId", deviceId);
+      }
 
       if (!aid) {
         throw new Error("Session expired. Please login again.");
