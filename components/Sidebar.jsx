@@ -147,7 +147,7 @@ const Sidebar = ({ isOpen = false, onClose }) => {
             isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
           ].join(" ")}
         >
-          <div className="m-3 rounded-2xl border border-primary/20 bg-white p-4">
+          <Link href="/profile" onClick={onClose} className="m-3 block rounded-2xl border border-primary/20 bg-white p-4 transition-colors hover:bg-primary/5">
             <div className="flex gap-3">
               <div className="h-14 w-14 shrink-0 overflow-hidden rounded-full border border-primary/25 bg-primary-light">
                 {profileImagePath ? (
@@ -160,7 +160,7 @@ const Sidebar = ({ isOpen = false, onClose }) => {
                 <p className="text-xs text-primary/80">{`Followers: ${followerCount}`}</p>
               </div>
             </div>
-          </div>
+          </Link>
           <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-2 pb-4">
             {MENU.map((item) => {
               const isAllowedIfUnverified = ["/", "/kyc-details", "/logout", "/help-support", "/settings","/about-us",
