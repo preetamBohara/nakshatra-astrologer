@@ -13,6 +13,8 @@ import { removeCookie } from "@/lib/clientHelpers";
 import { postAPIAuth, getAPIAuth } from "@/lib/apiServices";
 import { API_ENDPOINTS } from "@/constants/apiConstants";
 import React, { useState } from "react";
+import { AUTH_TOKEN_KEY, FIREBASE_FCM_TOKEN } from "@/constants/others";
+import toast from "react-hot-toast";
 
 const MENU = [
   { labelKey: "dashboard", fallbackLabel: "Dashboard", icon: "home", href: "/" },
@@ -111,14 +113,22 @@ const Sidebar = ({ isOpen = false, onClose }) => {
 
   const handleLogoutConfirm = async () => {
     try {
-      // Attempt POST standard logout, fallback to GET if the backend expects different method
-      await postAPIAuth(API_ENDPOINTS.LOGOUT, {}).catch(() => getAPIAuth(API_ENDPOINTS.LOGOUT));
-    } catch (error) {
-      console.error("Logout API failed:", error);
+      await getAPIAuth(API_ENDPOINTS.LOGOUT).then((res) => {
+        console.log("Logout API success:", res);
+        toast.success(res?.message || "Logout successful");
+        setIsLogoutModalOpen(false);
+        removeCookie(AUTH_TOKEN_KEY);
+        sessionStorage.removeItem(FIREBASE_FCM_TOKEN);
+        window.location.replace("/login");
+      })
+      .catch((error) => {
+        console.error("Logout API failed:", error);
+      });
     } finally {
-      removeCookie("authToken");
-      // A hard redirect completely flushes the Redux state and Javascript memory cache
-      window.location.replace("/login");
+      // removeCookie("authToken");
+      // sessionStorage.removeItem(FIREBASE_FCM_TOKEN);
+      // // A hard redirect completely flushes the Redux state and Javascript memory cache
+      // window.location.replace("/login");
     }
   };
 
