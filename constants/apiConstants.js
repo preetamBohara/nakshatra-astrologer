@@ -1,4 +1,4 @@
-// const API_FALLBACK_URL = "http://3.108.130.191:7005";
+// const API_FALLBACK_URL = "http://localhost:7005";
 const API_FALLBACK_URL = "https://astrologer.nakshatraai.ai";
 
 
@@ -41,6 +41,7 @@ export const API_ENDPOINTS = {
   CREATE_BLOG: "/api/astrologer/create-blog",
   DELETE_BLOG: "/api/astrologer/delete-blog",
   EDIT_BLOG: "/api/astrologer/update-blog",
+  GET_BLOG_DETAILS: "/api/astrologer/get-blog-details",
 
   // Logout Api
   LOGOUT:"/api/astrologer/logout"

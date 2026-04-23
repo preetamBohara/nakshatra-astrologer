@@ -1,8 +1,9 @@
+import { Wallet } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
-
+import WithdrawModal from "./common/WithdrawModal";
 function NavIcon({ name }) {
   const common = "h-5 w-5 shrink-0 text-[#6A6A6A]";
   switch (name) {
@@ -21,7 +22,10 @@ function NavIcon({ name }) {
 const Header = ({ onMenuClick }) => {
   const profile = useSelector((state) => state.dashboard.profile.data);
   const rawBalance = profile?.balance ?? profile?.walletAmount ?? profile?.wallet?.amount ?? profile?.totalBalance ?? 2;
-  const balanceValue = Number(rawBalance || 0).toFixed(2);
+  const balanceValue = Math.floor(Number(rawBalance || 0));
+
+  const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
+
 
   return (
     <>
@@ -46,9 +50,16 @@ const Header = ({ onMenuClick }) => {
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="flex flex-col items-center justify-center rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1.5">
-            <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-xs font-semibold text-white">{`\u20B9${balanceValue}`}</span>
-            <span className="ml-2 text-[11px] font-semibold tracking-[0.08em] text-primary">TOTAL BALANCE</span>
+          <div 
+            className="flex items-center justify-center rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1.5 cursor-pointer hover:bg-primary/20 transition-colors"
+            onClick={() => setIsWithdrawModalOpen(true)}
+          >
+            <div className="flex items-center gap-1">
+              <Wallet className="h-5 w-5 md:hidden text-primary" />
+              <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-2 text-xs font-semibold text-white">{`\u20B9${balanceValue}`}</span>
+            </div>
+
+            <span className="hidden md:inline-block ml-2 text-[11px] font-semibold tracking-[0.08em] text-primary">TOTAL BALANCE</span>
           </div>
 
           <Link href="/notifications" className="relative cursor-pointer rounded-full p-2 text-[#5C5C5C] hover:bg-[#F5F5F5]" aria-label="Notifications">
@@ -57,6 +68,12 @@ const Header = ({ onMenuClick }) => {
           </Link>
         </div>
       </header>
+
+      <WithdrawModal 
+        isOpen={isWithdrawModalOpen} 
+        onClose={() => setIsWithdrawModalOpen(false)} 
+        balance={rawBalance} 
+      />
     </>
   );
 };

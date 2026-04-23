@@ -8,6 +8,9 @@ import toast from "react-hot-toast";
 import { createBlog, editBlog, fetchBlogs } from "@/redux/slices/dashboardSlice";
 import { uploadToS3 } from "@/lib/uploadToS3";
 import { getBackendImageUrl } from "@/lib/getBackendImageUrl";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import { useRef } from "react";
 
 const CATEGORIES = ["Astrology", "Health", "Horoscope", "Spirituality", "Lifestyle"];
 
@@ -26,6 +29,8 @@ export default function AddBlogPage() {
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [tableOfContents, setTableOfContents] = useState([{ sectionTitle: "", sectionContent: "" }]);
+  const editorRef = useRef(null);
 
   useEffect(() => {
     if (editId && blogs.length > 0) {
@@ -36,6 +41,19 @@ export default function AddBlogPage() {
         setContent(existing.content || "");
         if (existing.image) {
           setImagePreview(getBackendImageUrl(existing.image));
+        }
+        if (existing.tableOfContents) {
+          let toc = existing.tableOfContents;
+          if (typeof toc === "string") {
+            try {
+              toc = JSON.parse(toc);
+            } catch (e) {
+              toc = [];
+            }
+          }
+          if (Array.isArray(toc) && toc.length > 0) {
+            setTableOfContents(toc);
+          }
         }
       }
     }
@@ -65,6 +83,16 @@ export default function AddBlogPage() {
       return;
     }
 
+    const validSections = tableOfContents.filter(
+      (section) =>
+        (section?.sectionTitle || "").trim() && (section?.sectionContent || "").trim()
+    );
+
+    if (validSections.length === 0) {
+      toast.error("At least one table of contents section is required");
+      return;
+    }
+
     let imageKey = "";
 
     if (imageFile) {
@@ -84,6 +112,7 @@ export default function AddBlogPage() {
       content: content.trim(),
       category,
       status,
+      tableOfContents: JSON.stringify(validSections),
       ...(imageKey ? { image: imageKey } : {}),
     };
 
@@ -189,13 +218,96 @@ export default function AddBlogPage() {
         {/* Content */}
         <div>
           <label className="mb-1 block text-sm font-medium text-[#333]">Blog Content</label>
-          <textarea
-            rows={6}
-            placeholder="Start writing about how Saturn's return influences life transitions..."
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            className="w-full rounded-lg border border-[#D9D2DE] px-3 py-2.5 text-sm outline-none focus:border-primary"
-          />
+          <div className="prose max-w-none border border-[#D9D2DE] rounded-lg overflow-hidden">
+            <CKEditor
+              editor={ClassicEditor}
+              data={content}
+              onReady={(editor) => {
+                editorRef.current = editor;
+              }}
+              onChange={(event, editor) => {
+                const data = editor.getData();
+                setContent(data);
+              }}
+              config={{
+                toolbar: [
+                  "heading", "|", "bold", "italic", "link", "bulletedList", "numberedList", "|", "outdent", "indent", "|", "blockQuote", "insertTable", "|", "undo", "redo"
+                ],
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Table of Contents */}
+        <div>
+          <label className="mb-1 block text-sm font-medium text-[#333]">Table of Contents</label>
+          <div className="space-y-4">
+            {tableOfContents.map((section, index) => (
+              <div key={index} className="rounded-xl border border-[#D3CCD9] p-4 bg-[#FCFBFD]">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-semibold text-[#1F1F1F]">Section {index + 1}</span>
+                  {tableOfContents.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newSections = tableOfContents.filter((_, i) => i !== index);
+                        setTableOfContents(newSections);
+                      }}
+                      className="text-xs font-medium text-red-500 hover:text-red-700 bg-red-50 px-2 py-1 rounded"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+                
+                <div className="mb-3">
+                  <input
+                    type="text"
+                    placeholder="Section Title"
+                    value={section.sectionTitle}
+                    onChange={(e) => {
+                      const newVal = e.target.value;
+                      setTableOfContents((prev) =>
+                        prev.map((sec, i) => (i === index ? { ...sec, sectionTitle: newVal } : sec))
+                      );
+                    }}
+                    className="h-11 w-full rounded-lg border border-[#D9D2DE] px-3 text-sm outline-none focus:border-primary"
+                  />
+                </div>
+                
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-[#7A7A7A]">Section Content</label>
+                  <div className="prose max-w-none border border-[#D9D2DE] rounded-lg overflow-hidden">
+                    <CKEditor
+                      editor={ClassicEditor}
+                      data={section.sectionContent}
+                      onChange={(event, editor) => {
+                        const editorData = editor.getData();
+                        setTableOfContents((prev) =>
+                          prev.map((sec, i) => (i === index ? { ...sec, sectionContent: editorData } : sec))
+                        );
+                      }}
+                      config={{
+                        toolbar: [
+                          "heading", "|", "bold", "italic", "link", "bulletedList", "numberedList", "|", "outdent", "indent", "|", "blockQuote", "|", "undo", "redo"
+                        ],
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+            
+            <button
+              type="button"
+              onClick={() => {
+                setTableOfContents([...tableOfContents, { sectionTitle: "", sectionContent: "" }]);
+              }}
+              className="mt-2 text-sm font-semibold text-primary hover:text-primary/80 inline-flex items-center gap-1"
+            >
+              + Add Section
+            </button>
+          </div>
         </div>
 
         {/* Actions */}

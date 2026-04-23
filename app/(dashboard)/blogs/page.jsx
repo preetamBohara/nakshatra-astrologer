@@ -97,6 +97,20 @@ function BlogCard({ blog, onDelete }) {
               type="button"
               onClick={() => {
                 setMenuOpen(false);
+                router.push(`/blogs/${blog._id}`);
+              }}
+              className="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-[#333] hover:bg-[#F5F0FA]"
+            >
+              <svg className="h-3.5 w-3.5 text-[#555]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+              View
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setMenuOpen(false);
                 router.push(`/blogs/add?editId=${blog._id}`);
               }}
               className="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-[#333] hover:bg-[#F5F0FA]"

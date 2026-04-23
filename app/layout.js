@@ -1,4 +1,4 @@
-﻿import { Inter } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import ToastProvider from "@/components/ToastProvider";
 import { I18nProvider } from "@/components/I18nProvider";
@@ -13,6 +13,11 @@ const inter = Inter({
 export const metadata = {
   title: "Nakshtra.ai Astrologer",
   description: "Nakshtra.ai Astrologer App",
+  icons: {
+    icon: "/assets/img/logo.png",
+    shortcut: "/assets/img/logo.png",
+    apple: "/assets/img/logo.png",
+  },
 };
 
 export default function RootLayout({ children }) {

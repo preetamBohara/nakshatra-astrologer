@@ -16,7 +16,7 @@ export default function ReduxProvider({ children }) {
       try {
         const fcmToken = await requestForToken();
         if (fcmToken) {
-          // console.log("FCM Token:", fcmToken);
+          console.log("FCM Token:", fcmToken);
           sessionStorage.setItem(FIREBASE_FCM_TOKEN, fcmToken);
         }
       } catch (error) {

@@ -56,7 +56,7 @@ export default function ProfilePage() {
       name: "", dob: "", email: "", gender: "", cityState: "", experience: "",
       languages: [], expertises: [], consultationType: [],
       ratePerMinChat: "", ratePerMinCall: "", ratePerMinVideoCall: "",
-      chartType: "North Indian", achievements: "", about: "", image: "", certificate: ""
+      chartType: "North Indian", achievements: "", about: "", image: "", certificates: []
     };
 
     let consultationType = profileData.consultationType || [];
@@ -84,7 +84,7 @@ export default function ProfilePage() {
       achievements: profileData.achievements || "",
       about: profileData.about || "",
       image: profileData.image || "",
-      certificate: profileData.certificate || ""
+      certificates: profileData.certificates || []
     };
   };
 
@@ -163,6 +163,31 @@ export default function ProfilePage() {
       toast.dismiss();
       toast.success("Uploaded successfully");
       setFieldValue(fieldName, key);
+    } catch (err) {
+      toast.dismiss();
+      toast.error("Upload failed");
+    }
+  };
+
+  const handleCertUpload = async (e) => {
+    if (!isEditing) return;
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const currentCerts = values.certificates || [];
+    if (currentCerts.length >= 5) {
+      toast.error("Maximum 5 certificates allowed");
+      return;
+    }
+
+    try {
+      toast.loading("Uploading certificate...");
+      const key = await uploadToS3(file);
+      toast.dismiss();
+      toast.success("Certificate uploaded successfully");
+      setFieldValue('certificates', [...currentCerts, key]);
+      // Reset input so the same file can be uploaded again if needed
+      if (certInputRef.current) certInputRef.current.value = '';
     } catch (err) {
       toast.dismiss();
       toast.error("Upload failed");
@@ -482,26 +507,40 @@ export default function ProfilePage() {
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="text-sm font-medium text-gray-700">Certification Upload(Optional)</label>
-          <div 
-            onClick={() => isEditing && certInputRef.current?.click()}
-            className={`border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center gap-2 ${
-              isEditing ? "border-gray-300 hover:border-primary/50 cursor-pointer bg-gray-50/50" : "border-gray-200 bg-gray-50"
-            }`}
-          >
-            {values.certificate ? (
-               <div className="text-sm text-gray-700 flex items-center gap-2">
-                 <svg className="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                 Certificate Uploaded
-               </div>
-            ) : (
-               <div className="text-sm text-gray-500 flex items-center gap-2">
-                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
-                 Click to upload your certification
-               </div>
-            )}
-          </div>
-          <input type="file" ref={certInputRef} className="hidden" accept="image/*,.pdf" onChange={(e) => handleImageUpload(e, 'certificate')} />
+          <label className="text-sm font-medium text-gray-700">Certification Upload(Optional) - Up to 5</label>
+          {values.certificates && values.certificates.length > 0 && (
+             <div className="flex flex-col gap-2 mb-2">
+               {values.certificates.map((cert, index) => (
+                  <div key={index} className="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-200">
+                    <a href={getBackendImageUrl(cert)} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:underline flex items-center gap-2 truncate">
+                       <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
+                       <span className="truncate">Certificate {index + 1}</span>
+                    </a>
+                    {isEditing && (
+                       <button type="button" onClick={() => {
+                          const newCerts = [...values.certificates];
+                          newCerts.splice(index, 1);
+                          setFieldValue('certificates', newCerts);
+                       }} className="text-red-500 hover:text-red-700 p-1 flex-shrink-0">
+                          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                       </button>
+                    )}
+                  </div>
+               ))}
+             </div>
+          )}
+          {isEditing && (!values.certificates || values.certificates.length < 5) && (
+             <div 
+               onClick={() => certInputRef.current?.click()}
+               className="border-2 border-dashed border-gray-300 hover:border-primary/50 cursor-pointer bg-gray-50/50 rounded-lg p-6 flex flex-col items-center justify-center gap-2"
+             >
+                <div className="text-sm text-gray-500 flex items-center gap-2">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                  Click to upload a certificate (Max 5)
+                </div>
+             </div>
+          )}
+          <input type="file" ref={certInputRef} className="hidden" accept="image/*,.pdf" onChange={handleCertUpload} />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
