@@ -1,8 +1,9 @@
-﻿import { Inter } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import ToastProvider from "@/components/ToastProvider";
 import { I18nProvider } from "@/components/I18nProvider";
 import ReduxProvider from "@/components/providers/ReduxProvider";
+import SocketProvider from "@/components/providers/SocketProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -23,12 +24,15 @@ export default function RootLayout({ children }) {
     >
       <body className="h-dvh overflow-hidden">
         <ReduxProvider>
-          <I18nProvider>
-            {children}
-            <ToastProvider />
-          </I18nProvider>
+          <SocketProvider>
+            <I18nProvider>
+              {children}
+              <ToastProvider />
+            </I18nProvider>
+          </SocketProvider>
         </ReduxProvider>
       </body>
     </html>
   );
 }
+

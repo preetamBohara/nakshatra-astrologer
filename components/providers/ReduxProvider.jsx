@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { Provider } from "react-redux";
 import { store } from "@/redux/store";
@@ -32,7 +32,7 @@ export default function ReduxProvider({ children }) {
         .then((payload) => {
           const { title, body } = payload.notification || {};
           if (title || body) {
-            toast.info(`${title || ""} ${body ? `- ${body}` : ""}`.trim());
+            toast(`${title || ""} ${body ? `- ${body}` : ""}`.trim());
           }
           
           listenForMessages();
