@@ -1,7 +1,7 @@
 "use client";
 
 import { API_ENDPOINTS } from "@/constants/apiConstants";
-import { AUTH_TOKEN_KEY } from "@/constants/others";
+import { AUTH_TOKEN_KEY, FIREBASE_FCM_TOKEN } from "@/constants/others";
 import { postAPI } from "@/lib/apiServices";
 import { setCookies } from "@/lib/clientHelpers";
 import { useRouter } from "next/navigation";
@@ -146,6 +146,7 @@ export function useOtp() {
       const userAgent = navigator.userAgent.toLowerCase();
       const deviceName = userAgent.includes("chrome") ? "chrome" : "browser";
       let deviceId = localStorage.getItem("deviceId");
+      const fcmToken = sessionStorage.getItem(FIREBASE_FCM_TOKEN);
       if (!deviceId) {
         deviceId = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
         localStorage.setItem("deviceId", deviceId);
@@ -160,7 +161,7 @@ export function useOtp() {
         code,
         deviceId,
         deviceName,
-        fcmToken: "astrologer",
+        fcmToken: fcmToken || "astrologer",
       };
 
       const response = await postAPI(API_ENDPOINTS.VERIFY_OTP, payload);

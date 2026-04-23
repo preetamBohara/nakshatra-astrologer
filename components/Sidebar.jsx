@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { getBackendImageUrl } from "@/lib/getBackendImageUrl";
@@ -110,6 +110,7 @@ const Sidebar = ({ isOpen = false, onClose }) => {
   const [isPanModalOpen, setIsPanModalOpen] = useState(false);
   const [isBankModalOpen, setIsBankModalOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const router = useRouter();
 
   const handleLogoutConfirm = async () => {
     try {
@@ -119,7 +120,7 @@ const Sidebar = ({ isOpen = false, onClose }) => {
         setIsLogoutModalOpen(false);
         removeCookie(AUTH_TOKEN_KEY);
         sessionStorage.removeItem(FIREBASE_FCM_TOKEN);
-        window.location.replace("/login");
+        router.replace("/login");
       })
       .catch((error) => {
         console.error("Logout API failed:", error);

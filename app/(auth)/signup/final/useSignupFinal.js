@@ -1,7 +1,7 @@
 "use client";
 
 import { API_ENDPOINTS } from "@/constants/apiConstants";
-import { AUTH_TOKEN_KEY } from "@/constants/others";
+import { AUTH_TOKEN_KEY, FIREBASE_FCM_TOKEN } from "@/constants/others";
 import { postAPI } from "@/lib/apiServices";
 import { setCookies } from "@/lib/clientHelpers";
 import { useRouter } from "next/navigation";
@@ -62,6 +62,7 @@ export function useSignupFinal() {
       const userAgent = navigator.userAgent.toLowerCase();
       const deviceName = userAgent.includes("chrome") ? "chrome" : "browser";
       const deviceId = navigator.vendor || "web";
+      const fcmToken = sessionStorage.getItem(FIREBASE_FCM_TOKEN);
 
       const payload = {
         name: stepOne.name || "",
@@ -84,7 +85,7 @@ export function useSignupFinal() {
         ratePerMinCall: String(stepTwo.ratePerMinCall || ""),
         ratePerMinChat: String(stepTwo.ratePerMinChat || ""),
         ratePerMinVideoCall: String(stepTwo.ratePerMinVideoCall || ""),
-        fcmToken: "",
+        fcmToken: fcmToken || "astrologer",
       };
 
       if (aid) {
