@@ -6,8 +6,9 @@
  */
 export function getChatId(uid1, uid2) {
   if (!uid1 || !uid2) return "";
-  const ids = [uid1.toString(), uid2.toString()].sort();
-  return ids.join("_");
+  const s1 = uid1.toString();
+  const s2 = uid2.toString();
+  return s1 < s2 ? `${s1}_${s2}` : `${s2}_${s1}`;
 }
 
 /**
