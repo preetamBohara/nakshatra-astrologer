@@ -61,6 +61,10 @@ const Greeting = () => {
   ];
 
   const handleStatusToggle = async () => {
+    if (profile?.profileStatus === "pending" || profile?.profileStatus === "rejected") {
+      toast.error("Your Profile is not Verified by the Admin");
+      return;
+    }
     if (profile?.documents?.aadharCard?.status !== 1) {
       setIsAadharModalOpen(true);
       return;
@@ -86,6 +90,10 @@ const Greeting = () => {
   };
 
   const handleServiceToggle = async (serviceKey) => {
+    if (profile?.profileStatus === "pending") {
+      toast.error("Your Profile is not Verified by the Admin");
+      return;
+    }
     if (profile?.documents?.aadharCard?.status !== 1) {
       setIsAadharModalOpen(true);
       return;
