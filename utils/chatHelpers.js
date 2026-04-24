@@ -11,6 +11,12 @@ export function getChatId(uid1, uid2) {
   return s1 < s2 ? `${s1}_${s2}` : `${s2}_${s1}`;
 }
 
+// export const getChatId = (uid1, uid2) => {
+//   if (!uid1 || !uid2) return "";
+//   const ids = [uid1.trim(), uid2.trim()].sort();
+//   return ids.join("_");
+// };
+
 /**
  * Format a Firestore timestamp into a time string (e.g. "2:30 PM").
  */
