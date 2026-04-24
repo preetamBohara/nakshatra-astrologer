@@ -29,7 +29,7 @@ import toast from "react-hot-toast";
 import Image from "next/image";
 import { getBackendImageUrl } from "@/lib/getBackendImageUrl";
 
-const AstrologerChatScreen = () => {
+const AstrologerChatScreen = ({ urlChatId }) => {
   const dispatch = useDispatch();
   const router = useRouter();
   const activeChat = useSelector((state) => state.chat.activeChat);
@@ -39,7 +39,7 @@ const AstrologerChatScreen = () => {
   const userId = activeChat.userId;
   const userName = activeChat.userName || "User";
   const userImage = activeChat.userImage;
-  const chatId = activeChat.chatId || (astrologerId && userId ? getChatId(astrologerId, userId) : null);
+  const chatId = urlChatId || activeChat.chatId || (astrologerId && userId ? getChatId(astrologerId, userId) : null);
 
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { getBackendImageUrl } from "@/lib/getBackendImageUrl";
 import AadharVerificationModal from "@/components/common/AadharVerificationModal";
 import PanVerificationModal from "@/components/common/PanVerificationModal";
@@ -15,6 +15,8 @@ import { API_ENDPOINTS } from "@/constants/apiConstants";
 import React, { useState } from "react";
 import { AUTH_TOKEN_KEY, FIREBASE_FCM_TOKEN } from "@/constants/others";
 import toast from "react-hot-toast";
+import { resetDashboard } from "@/redux/slices/dashboardSlice";
+import { clearActiveChat, clearIncomingRequests } from "@/redux/slices/chatSlice";
 
 const MENU = [
   { labelKey: "dashboard", fallbackLabel: "Dashboard", icon: "home", href: "/" },
@@ -105,6 +107,7 @@ function MenuIcon({ name }) {
 const Sidebar = ({ isOpen = false, onClose }) => {
   const pathname = usePathname();
   const { t } = useTranslation();
+  const dispatch = useDispatch();
   const profile = useSelector((state) => state.dashboard.profile.data);
   const [isAadharModalOpen, setIsAadharModalOpen] = useState(false);
   const [isPanModalOpen, setIsPanModalOpen] = useState(false);
@@ -114,22 +117,21 @@ const Sidebar = ({ isOpen = false, onClose }) => {
 
   const handleLogoutConfirm = async () => {
     try {
-      await getAPIAuth(API_ENDPOINTS.LOGOUT).then((res) => {
-        console.log("Logout API success:", res);
-        toast.success(res?.message || "Logout successful");
-        setIsLogoutModalOpen(false);
-        removeCookie(AUTH_TOKEN_KEY);
-        sessionStorage.removeItem(FIREBASE_FCM_TOKEN);
-        router.replace("/login");
-      })
-      .catch((error) => {
-        console.error("Logout API failed:", error);
-      });
+      await getAPIAuth(API_ENDPOINTS.LOGOUT);
+    } catch (error) {
+      console.error("Logout API failed:", error);
     } finally {
-      // removeCookie("authToken");
-      // sessionStorage.removeItem(FIREBASE_FCM_TOKEN);
-      // // A hard redirect completely flushes the Redux state and Javascript memory cache
-      // window.location.replace("/login");
+      // Clear all Redux state so next login doesn't see stale data
+      dispatch(resetDashboard());
+      dispatch(clearActiveChat());
+      dispatch(clearIncomingRequests());
+
+      // Remove auth credentials
+      removeCookie(AUTH_TOKEN_KEY);
+      sessionStorage.removeItem(FIREBASE_FCM_TOKEN);
+
+      // Hard redirect — completely flushes Redux store & JS memory
+      window.location.replace("/login");
     }
   };
 

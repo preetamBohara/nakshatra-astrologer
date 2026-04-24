@@ -400,7 +400,11 @@ const initialState = {
 const dashboardSlice = createSlice({
   name: "dashboard",
   initialState,
-  reducers: {},
+  reducers: {
+    resetDashboard() {
+      return initialState;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchDashboardProfile.pending, (state) => {
@@ -672,4 +676,5 @@ const dashboardSlice = createSlice({
   },
 });
 
+export const { resetDashboard } = dashboardSlice.actions;
 export const dashboardReducer = dashboardSlice.reducer;

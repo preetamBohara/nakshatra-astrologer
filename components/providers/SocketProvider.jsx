@@ -24,7 +24,7 @@ import {
   setConnectionStatus,
   clearActiveChat,
 } from "@/redux/slices/chatSlice";
-import { fetchPendingChatRequests } from "@/redux/slices/dashboardSlice";
+import { fetchPendingChatRequests, fetchDashboardProfile } from "@/redux/slices/dashboardSlice";
 import { useRouter } from "next/navigation";
 
 const SocketContext = React.createContext(null);
@@ -37,28 +37,41 @@ export default function SocketProvider({ children }) {
   const dispatch = useDispatch();
   const router = useRouter();
   const activeChat = useSelector((state) => state.chat.activeChat);
-  const profileData = useSelector((state) => state.dashboard.profileData);
+  const profile = useSelector((state) => state.dashboard.profile.data);
+
+  // console.log("profile", profile);
   const authenticatedRef = useRef(false);
   const activeChatRef = useRef(activeChat);
+  const profileRef = useRef(profile);
 
   // Keep ref in sync so callbacks always see latest state
   useEffect(() => {
     activeChatRef.current = activeChat;
   }, [activeChat]);
 
-  // checkAstro interval heartbeat
   useEffect(() => {
-    const socket = getSocket();
-    if (!socket || !profileData?._id) return;
+    profileRef.current = profile;
+  }, [profile]);
 
-    const interval = setInterval(() => {
-      if (socket.connected && authenticatedRef.current) {
-        emitCheckAstro(profileData._id);
-      }
-    }, 30000); // every 30 seconds
+  // checkAstro heartbeat logic
+  // useEffect(() => {
+  //   const socket = getSocket();
+  //   if (!socket || !profile?._id) return;
 
-    return () => clearInterval(interval);
-  }, [profileData?._id]);
+  //   const sendHeartbeat = () => {
+  //     if (socket.connected && authenticatedRef.current) {
+  //       console.log("[Socket] Sending heartbeat (checkAstro) for:", profile._id);
+  //       // emitCheckAstro(profile._id);
+  //     }
+  //   };
+
+  //   // Send immediately if already authenticated
+  //   sendHeartbeat();
+
+  //   const interval = setInterval(sendHeartbeat, 30000); // every 30 seconds
+
+  //   return () => clearInterval(interval);
+  // }, [profile?._id]); // We'll handle authentication status via the interval check
 
   useEffect(() => {
     const socket = getSocket();
@@ -84,6 +97,15 @@ export default function SocketProvider({ children }) {
     const unsubAuth = onAuthenticationSuccess((data) => {
       authenticatedRef.current = true;
       console.log("[Socket] Authenticated:", data);
+      // Trigger heartbeat immediately after auth success
+      const currentProfile = profileRef.current;
+      if (currentProfile?._id) {
+        console.log("[Socket] Triggering immediate heartbeat after auth success");
+        // emitCheckAstro(currentProfile._id);
+        // Refresh profile and requests to sync online status from backend
+        void dispatch(fetchDashboardProfile());
+        void dispatch(fetchPendingChatRequests());
+      }
     });
 
     const unsubRequest = onConnectionRequest((data) => {

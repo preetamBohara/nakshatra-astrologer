@@ -80,7 +80,7 @@ const ChatRequest = () => {
     emitAcceptConnection(userId);
 
     // Navigate to chat page
-    router.push("/chat");
+    router.push(`/chat/${chatId}`);
   };
 
   return (
